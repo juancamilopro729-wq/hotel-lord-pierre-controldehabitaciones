@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Control de Habitaciones - Hotel Lord Pierre</title>
+<style>
+  :root{
+    --gris-panel:#f3f4f6;
+    --azul:#2563eb;
+    --rojo:#ef4444;
+    --verde:#22c55e;
+    --naranja:#f97316;
+    --amarillo:#eab308;
+    --estrella:#dc2626;
+    --borde:#d1d5db;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;}
+  body{background:#f9fafb;display:flex;height:100vh;overflow:hidden;}
+
+ /* Logo fijo discreto */
+.logo-fijo {
+  position: fixed;
+  bottom: 10px;     /* ahora abajo */
+  right: 10px;      /* y en la esquina derecha */
+  z-index: 50;      /* debajo de los paneles */
+  opacity: 0.6;     /* semitransparente */
+  transition: opacity 0.3s ease;
+}
+.logo-fijo:hover {
+  opacity: 1;
+}
+.logo-fijo img {
+  height: 50px;     /* más pequeño */
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2)); /* leve sombra */
+  pointer-events: none;
+  user-select: none;
+  }
+
+  /* Sidebar pisos */
+  .sidebar{
+    background:var(--gris-panel);
+    width:200px; display:flex; flex-direction:column; align-items:center;
+    gap:14px; padding:20px 12px; border-right:1px solid var(--borde);
+    overflow-y:auto;
+  }
+  .btn-piso{
+    width:100%; padding:12px; border:none; border-radius:10px;
+    font-size:15px; font-weight:700; color:#fff; background:var(--azul);
+    cursor:pointer; transition:.2s;
+  }
+  .btn-piso:hover{filter:brightness(.95);}
+  .btn-piso.active{background:#fff;color:var(--azul);border:2px solid var(--azul);}
+
+  /* Main */
+  .main{
+    flex:1; display:flex; flex-direction:column; align-items:center;
+    padding:18px; overflow-y:auto;
+  }
+  .piso{
+    opacity:0; transform:translateX(100%); position:absolute; transition:.45s ease;
+    width:100%; display:flex; flex-direction:column; align-items:center;
+  }
+  .piso.active{opacity:1; transform:translateX(0); position:relative;}
+  .titulo-piso{font-size:22px;margin:6px 0 16px;font-weight:800;}
+
+  /* Layout */
+  .contenedor{display:flex;flex-direction:column;align-items:center;gap:20px;}
+  @media(min-width:900px){.contenedor{flex-direction:row;align-items:flex-start;gap:56px;}}
+
+  /* Mapa */
+  .mapa{
+    background:#4b5563; padding:22px; border-radius:14px;
+    display:flex; justify-content:center; gap:28px; flex-wrap:wrap;
+  }
+  .columna{display:flex;flex-direction:column;gap:10px;}
+  .pasillo{display:flex;justify-content:space-between;width:100%;gap:80px;}
+
+  /* Habitación */
+  .habitacion{
+    width:70px;height:54px;border-radius:14px;color:#000;font-weight:800;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    cursor:pointer;position:relative;transition:transform .08s;
+  }
+  .habitacion:hover{transform:scale(1.04);}
+  .habitacion.selected{outline:4px solid #000;outline-offset:-4px;}
+  .verde{background:var(--verde);} .naranja{background:var(--naranja);}
+  .amarillo{background:var(--amarillo);} .rojo{background:var(--rojo);}
+  .estado-label{position:absolute;bottom:4px;font-size:11px;font-weight:700;color:#000;text-shadow:0 1px 2px #fff8;}
+  .estrella-nota{position:absolute;top:6px;right:8px;color:var(--estrella);font-size:18px;line-height:1;}
+
+  /* Paneles */
+  .panel{display:flex;flex-direction:column;align-items:center;gap:16px;width:92%;max-width:360px;}
+  .box{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:16px;width:100%;box-shadow:0 1px 4px rgba(0,0,0,.06);}
+  .box h3{margin-bottom:10px;font-size:16px;}
+  .leyenda-item{display:flex;align-items:center;margin:6px 0;font-size:14px;}
+  .leyenda-color{width:18px;height:18px;border-radius:4px;margin-right:10px;border:1px solid #9994;}
+  .actions{display:flex;gap:10px;margin-top:10px;align-items:center;}
+  .btn{padding:8px 12px;border-radius:8px;border:1px solid var(--borde);background:#f9fafb;cursor:pointer;font-weight:700;transition:.2s;}
+  .btn:hover{background:#f3f4f6;}
+  .btn.primary{background:#e0ecff;border-color:#bfdbfe;}
+  .btn.danger{background:#fee2e2;border-color:#fecaca;}
+  .badge{margin-left:auto;font-size:12px;color:#666;}
+  .estado{display:flex;align-items:center;gap:10px;font-size:14px;}
+  .estado .swatch{width:16px;height:16px;border-radius:4px;border:1px solid #9994;display:inline-block;}
+  .reloj{font-size:13px;color:#555;text-align:right;margin-bottom:6px;}
+  .resumen p{margin:6px 0;font-size:14px;line-height:1.4;}
+  textarea{width:100%;height:110px;border:1px solid #ccc;border-radius:10px;resize:none;padding:10px;font-size:14px;background:#f9fafb;}
+
+  /* Tabla ERP */
+  table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;}
+  th, td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left;}
+  th{background:#f3f4f6;font-weight:700;}
+  tr:hover td{background:#f9fafb;}
+  select, input[type="number"]{width:100%;padding:6px;border:1px solid #d1d5db;border-radius:8px;background:#fff;}
+  .delete-btn{background:none;border:none;color:#ef4444;font-size:16px;cursor:pointer;}
+
+  /* Menú de colores */
+  .menu-colores{
+    display:none; position:fixed; background:#fff; border:1px solid #ccc; border-radius:8px;
+    padding:6px; box-shadow:0 0 12px rgba(0,0,0,.2); z-index:1000;
+  }
+  .color-opcion{width:30px;height:30px;border-radius:6px;margin:6px;display:inline-block;cursor:pointer;border:1px solid #9994;}
+
+  @media(max-width:899px){
+    body{flex-direction:column;}
+    .sidebar{flex-direction:row;width:100%;gap:10px;overflow-x:auto;}
+    .btn-piso{width:auto;}
+    .main{padding:12px;}
+  }
+</style>
+</head>
+<body>
+
+<!-- Logo discreto del Hotel -->
+<div class="logo-fijo">
+  <img src="logo-lordpierre.png" alt="Hotel Lord Pierre" />
+</div>
+
+<!-- Sidebar pisos -->
+<div class="sidebar">
+  <button class="btn-piso active" data-piso="2">🏨 Piso 2</button>
+  <button class="btn-piso" data-piso="3">🏨 Piso 3</button>
+  <button class="btn-piso" data-piso="4">🏨 Piso 4</button>
+</div>
+
+<div class="main">
+  <div id="piso2" class="piso active"></div>
+  <div id="piso3" class="piso"></div>
+  <div id="piso4" class="piso"></div>
+</div>
+
+<!-- Menú colores -->
+<div class="menu-colores" id="menu">
+  <div class="color-opcion" data-color="verde"   style="background:var(--verde)"   title="Vacío limpio (VL)"></div>
+  <div class="color-opcion" data-color="naranja" style="background:var(--naranja)" title="Vacío sucio (VS)"></div>
+  <div class="color-opcion" data-color="amarillo"style="background:var(--amarillo)"title="Ocupado (OC)"></div>
+  <div class="color-opcion" data-color="rojo"    style="background:var(--rojo)"    title="Bloqueado (BL)"></div>
+</div>
+
+<script>
+/* ================== Datos base ================== */
+const pisos={2:{inicio:200,fin:221},3:{inicio:300,fin:319},4:{inicio:400,fin:421}};
+const COLOR_MAP={
+  verde:{label:'Vacío limpio',sigla:'VL'},
+  naranja:{label:'Vacío sucio',sigla:'VS'},
+  amarillo:{label:'Ocupado',sigla:'OC'},
+  rojo:{label:'Bloqueado',sigla:'BL'}
+};
+let pisoActivo=2,habitacionSeleccionada=null;
+const menu=document.getElementById("menu");
+
+/* ================== Utilidades ================== */
+function safeReadAll(){
+  try{ return JSON.parse(localStorage.getItem("datosHabitaciones")) || {2:{},3:{},4:{}}; }
+  catch{ return {2:{},3:{},4:{}}; }
+}
+function safeWrite(piso,num,data){
+  const all=safeReadAll(); if(!all[piso]) all[piso]={};
+  all[piso][num]={...(all[piso][num]||{}),...data};
+  localStorage.setItem("datosHabitaciones",JSON.stringify(all));
+}
+function obtenerColor(h){ return [...h.classList].find(c=>Object.keys(COLOR_MAP).includes(c))||"verde"; }
+function setEtiqueta(h,color){ h.querySelector(".estado-label").textContent=COLOR_MAP[color].sigla; }
+function syncStar(h,nota){
+  const prev=h.querySelector(".estrella-nota"); if(prev) prev.remove();
+  if(nota && nota.trim()){ const s=document.createElement("span"); s.className="estrella-nota"; s.textContent="★"; h.appendChild(s); }
+}
+const ahoraStr = ()=> new Date().toLocaleString();
+
+/* ================== Construcción de UI ================== */
+function crearPiso(piso){
+  const cont=document.getElementById(`piso${piso}`);
+  cont.innerHTML=`
+  <div class="titulo-piso">📍 Estás viendo: Piso ${piso}</div>
+  <div class="contenedor">
+    <!-- Panel izquierdo -->
+    <div class="panel">
+      <div class="box">
+        <h3>🛏️ Configuración de camas</h3>
+        <table id="tablaCamas${piso}">
+          <thead><tr><th>Cantidad</th><th>Tipo</th><th></th></tr></thead>
+          <tbody></tbody>
+        </table>
+        <div class="actions">
+          <button id="agregarCama${piso}" class="btn">+ Agregar cama</button>
+        </div>
+        <div class="actions">
+          <button id="guardarCamas${piso}" class="btn primary" disabled>Guardar configuración</button>
+          <button id="eliminarCamas${piso}" class="btn danger" disabled>Eliminar todas</button>
+          <span id="badgeCamas${piso}" class="badge"></span>
+        </div>
+      </div>
+      <div class="box">
+        <h3>📊 Resumen de habitación</h3>
+        <div id="reloj${piso}" class="reloj"></div>
+        <div id="resumenContenido${piso}" class="resumen"><p>Selecciona una habitación...</p></div>
+      </div>
+    </div>
+
+    <!-- Centro -->
+    <div class="mapa" id="mapa${piso}"></div>
+
+    <!-- Panel derecho -->
+    <div class="panel">
+      <div class="box">
+        <h3>Significado de colores</h3>
+        ${Object.entries(COLOR_MAP).map(([k,v])=>`
+          <div class="leyenda-item"><div class="leyenda-color" style="background:var(--${k})"></div>${v.label} (${v.sigla})</div>`).join("")}
+      </div>
+      <div class="box">
+        <h3 id="notaTitulo${piso}">📋 Nota de habitación</h3>
+        <textarea id="notaTexto${piso}" placeholder="Escribe aquí la nota..." disabled></textarea>
+        <div class="actions">
+          <button id="btnGuardar${piso}" class="btn primary" disabled>Guardar</button>
+          <button id="btnEliminar${piso}" class="btn danger" disabled>Eliminar</button>
+          <span id="badge${piso}" class="badge"></span>
+        </div>
+      </div>
+      <div class="box"><div class="estado"><span class="swatch" id="swatch${piso}"></span><span id="estadoTexto${piso}">Sin selección.</span></div></div>
+    </div>
+  </div>`;
+  crearHabitaciones(piso);
+}
+
+function crearHabitaciones(piso){
+  const mapa=document.getElementById(`mapa${piso}`); mapa.innerHTML="";
+  const colP=document.createElement("div"), colI=document.createElement("div");
+  colP.className="columna"; colI.className="columna";
+  for(let n=pisos[piso].inicio;n<=pisos[piso].fin;n++){
+    const h=document.createElement("div");
+    h.className="habitacion verde"; h.dataset.num=n;
+    h.innerHTML=`<div>${n}</div><span class="estado-label">VL</span>`;
+    const saved=safeReadAll()?.[piso]?.[n];
+    if(saved){
+      if(saved.color){ h.className=`habitacion ${saved.color}`; setEtiqueta(h,saved.color); }
+      if(saved.nota){ syncStar(h,saved.nota); }
+    }
+    h.onclick=e=>{ e.stopPropagation(); seleccionarHabitacion(h,piso); abrirMenu(e); };
+    (n%2===0?colP:colI).appendChild(h);
+  }
+  const wrap=document.createElement("div"); wrap.className="pasillo"; wrap.append(colP,colI); mapa.appendChild(wrap);
+}
+
+/* ================== Interacción ================== */
+function seleccionarHabitacion(h,piso){
+  document.querySelectorAll(`#piso${piso} .habitacion.selected`).forEach(x=>x.classList.remove("selected"));
+  habitacionSeleccionada=h; pisoActivo=piso; h.classList.add("selected");
+  actualizarPanelNota(); actualizarPanelEstado(); actualizarPanelCamas(); solicitarResumen();
+}
+
+function actualizarPanelNota(){
+  const p=pisoActivo; if(!habitacionSeleccionada) return;
+  const num=habitacionSeleccionada.dataset.num;
+  const box=document.getElementById(`notaTexto${p}`);
+  const titulo=document.getElementById(`notaTitulo${p}`);
+  const btnG=document.getElementById(`btnGuardar${p}`);
+  const btnE=document.getElementById(`btnEliminar${p}`);
+  const badge=document.getElementById(`badge${p}`);
+  const saved=safeReadAll()?.[p]?.[num]||{};
+
+  box.disabled=false; btnG.disabled=false; btnE.disabled=false;
+  box.value=saved.nota||"";
+  titulo.textContent=`📋 Nota de habitación ${num}${saved.nota?" ★":""}`;
+
+  const setBadge=m=>{ badge.textContent=m; setTimeout(()=>badge.textContent="",1200); };
+
+  btnG.onclick=()=>{
+    safeWrite(p,num,{nota:box.value.trim(),fecha:ahoraStr()});
+    syncStar(habitacionSeleccionada,box.value);
+    setBadge("✅ Guardado");
+    solicitarResumen();
+  };
+  btnE.onclick=()=>{
+    safeWrite(p,num,{nota:"",fecha:ahoraStr()});
+    box.value=""; syncStar(habitacionSeleccionada,"");
+    setBadge("🗑️ Eliminado");
+    solicitarResumen();
+  };
+}
+
+function actualizarPanelEstado(){
+  const p=pisoActivo; if(!habitacionSeleccionada) return;
+  const num=habitacionSeleccionada.dataset.num;
+  const color=obtenerColor(habitacionSeleccionada);
+  const meta=COLOR_MAP[color];
+  document.getElementById(`estadoTexto${p}`).textContent=`Habitación ${num} — ${meta.label}.`;
+  document.getElementById(`swatch${p}`).style.background=getComputedStyle(document.documentElement).getPropertyValue(`--${color}`);
+}
+
+function actualizarPanelCamas(){
+  const p=pisoActivo;
+  const tabla=document.querySelector(`#tablaCamas${p} tbody`);
+  const btnG=document.getElementById(`guardarCamas${p}`);
+  const btnE=document.getElementById(`eliminarCamas${p}`);
+  const badge=document.getElementById(`badgeCamas${p}`);
+  const btnAdd=document.getElementById(`agregarCama${p}`);
+
+  if(!habitacionSeleccionada){
+    tabla.innerHTML=""; [btnG,btnE,btnAdd].forEach(b=>b.disabled=true); return;
+  }
+  [btnG,btnE,btnAdd].forEach(b=>b.disabled=false);
+
+  const num=habitacionSeleccionada.dataset.num;
+  const saved=safeReadAll()?.[p]?.[num]||{};
+  const camas=saved.camas||[];
+  tabla.innerHTML="";
+  camas.forEach(c=>agregarFilaCama(p,c.cantidad,c.tipo));
+
+  btnAdd.onclick=()=>agregarFilaCama(p,"","");
+
+  const setBadge=m=>{ badge.textContent=m; setTimeout(()=>badge.textContent="",1200); };
+
+  btnG.onclick=()=>{
+    const filas=[...tabla.querySelectorAll("tr")].map(tr=>({
+      cantidad:tr.querySelector("input").value,
+      tipo:tr.querySelector("select").value
+    })).filter(x=>x.cantidad && x.tipo);
+    safeWrite(p,num,{camas:filas,fecha:ahoraStr()});
+    setBadge("✅ Guardado");
+    solicitarResumen();
+  };
+  btnE.onclick=()=>{
+    safeWrite(p,num,{camas:[],fecha:ahoraStr()});
+    tabla.innerHTML="";
+    setBadge("🗑️ Eliminado");
+    solicitarResumen();
+  };
+}
+
+function agregarFilaCama(p,cantidad="",tipo=""){
+  const tabla=document.querySelector(`#tablaCamas${p} tbody`);
+  const tr=document.createElement("tr");
+  tr.innerHTML=`
+    <td><input type="number" min="1" value="${cantidad}" /></td>
+    <td>
+      <select>
+        <option value="">Tipo...</option>
+        <option ${tipo==="King"?"selected":""}>King</option>
+        <option ${tipo==="Queen"?"selected":""}>Queen</option>
+        <option ${tipo==="Doble"?"selected":""}>Doble</option>
+        <option ${tipo==="Individual"?"selected":""}>Individual</option>
+        <option ${tipo==="Mixta"?"selected":""}>Mixta</option>
+      </select>
+    </td>
+    <td><button class="delete-btn" title="Eliminar fila">×</button></td>
+  `;
+  tr.querySelector(".delete-btn").onclick=()=>tr.remove();
+  tabla.appendChild(tr);
+}
+
+/* ================== Resumen (throttle) ================== */
+let needsResumen=true;
+function solicitarResumen(){ needsResumen=true; }
+
+function actualizarResumen(){
+  const p=pisoActivo;
+  const resumen=document.getElementById(`resumenContenido${p}`);
+  const reloj=document.getElementById(`reloj${p}`);
+  reloj.textContent=new Date().toLocaleTimeString();
+
+  if(!habitacionSeleccionada){
+    resumen.innerHTML="<p>Selecciona una habitación...</p>";
+    return;
+  }
+  const num=habitacionSeleccionada.dataset.num;
+  const saved=safeReadAll()?.[p]?.[num]||{};
+  const color=obtenerColor(habitacionSeleccionada);
+  const meta=COLOR_MAP[color];
+
+  const camasTxt=(saved.camas&&saved.camas.length)
+    ? saved.camas.map(c=>`${c.cantidad} ${c.tipo}`).join(", ")
+    : "Sin registrar";
+  const notaTxt=saved.nota?saved.nota:"—";
+  const fechaTxt=saved.fecha?saved.fecha:"Sin registrar";
+
+  resumen.innerHTML=`
+    <p><strong>Habitación:</strong> ${num}</p>
+    <p><strong>Estado:</strong> ${meta.label}</p>
+    <p><strong>Camas:</strong> ${camasTxt}</p>
+    <p><strong>Última nota:</strong> ${notaTxt}</p>
+    <p><strong>Última modificación:</strong> ${fechaTxt}</p>`;
+}
+setInterval(()=>{
+  // Solo repinta el resumen cuando hace falta
+  if(needsResumen){ actualizarResumen(); needsResumen=false; }
+  // Actualiza la hora 1 vez por segundo sin forzar repintado de todo
+  const p=pisoActivo; const reloj=document.getElementById(`reloj${p}`);
+  if(reloj) reloj.textContent=new Date().toLocaleTimeString();
+},1000);
+
+/* ================== Menú colores ================== */
+function abrirMenu(e){
+  menu.style.left=`${e.clientX+10}px`;
+  menu.style.top=`${e.clientY+10}px`;
+  menu.style.display="block";
+}
+window.addEventListener("click",e=>{
+  if(!menu.contains(e.target) && !e.target.classList.contains("habitacion")) menu.style.display="none";
+});
+menu.querySelectorAll(".color-opcion").forEach(opt=>{
+  opt.addEventListener("click",()=>{
+    if(!habitacionSeleccionada) return;
+    const color=opt.dataset.color;
+    habitacionSeleccionada.className=`habitacion ${color}`;
+    setEtiqueta(habitacionSeleccionada,color);
+    const p=pisoActivo, num=habitacionSeleccionada.dataset.num;
+    const prev=safeReadAll()?.[p]?.[num]||{};
+    safeWrite(p,num,{color,nota:prev.nota,camas:prev.camas,fecha:ahoraStr()});
+    actualizarPanelEstado(); solicitarResumen(); menu.style.display="none";
+  });
+});
+
+/* ================== Navegación de pisos (guardando duplicados) ================== */
+document.querySelectorAll(".btn-piso").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    if(btn.classList.contains("active")) return; // evita clicks redundantes
+    document.querySelectorAll(".btn-piso").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const piso=Number(btn.dataset.piso);
+    document.querySelectorAll(".piso").forEach(p=>p.classList.remove("active"));
+    document.getElementById(`piso${piso}`).classList.add("active");
+    pisoActivo=piso; habitacionSeleccionada=null; menu.style.display="none";
+    actualizarPanelNota(); actualizarPanelEstado(); actualizarPanelCamas(); solicitarResumen();
+  });
+});
+
+/* ================== Inicialización ================== */
+[2,3,4].forEach(crearPiso);
+</script>
+</body>
+</html>
