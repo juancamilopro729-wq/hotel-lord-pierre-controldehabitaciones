@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Control de Habitaciones - Hotel Lord Pierre</title>
+
 <style>
   :root{
     --gris-panel:#f3f4f6;
@@ -48,7 +49,7 @@
   .piso.active{opacity:1; transform:translateX(0); position:relative;}
   .titulo-piso{font-size:22px;margin:6px 0 16px;font-weight:800;}
 
-  /* Layout */
+  /* Layout interno por piso */
   .contenedor{display:flex;flex-direction:column;align-items:center;gap:20px;}
   @media(min-width:900px){.contenedor{flex-direction:row;align-items:flex-start;gap:56px;}}
 
@@ -60,7 +61,7 @@
   .columna{display:flex;flex-direction:column;gap:10px;}
   .pasillo{display:flex;justify-content:space-between;width:100%;gap:80px;}
 
-  /* Habitación */
+  /* Habitación (tamaño normal) */
   .habitacion{
     width:70px;height:54px;border-radius:14px;color:#000;font-weight:800;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -73,7 +74,7 @@
   .estado-label{position:absolute;bottom:4px;font-size:11px;font-weight:700;color:#000;text-shadow:0 1px 2px #fff8;}
   .estrella-nota{position:absolute;top:6px;right:8px;color:var(--estrella);font-size:18px;line-height:1;}
 
-  /* Paneles */
+  /* Paneles laterales */
   .panel{display:flex;flex-direction:column;align-items:center;gap:16px;width:92%;max-width:360px;}
   .box{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:16px;width:100%;box-shadow:0 1px 4px rgba(0,0,0,.06);}
   .box h3{margin-bottom:10px;font-size:16px;}
@@ -135,62 +136,52 @@
   }
   .mini .pasillo{ gap:48px; }
 
+  /* Ajustes por tamaño de pantalla */
   @media(max-width:1500px){
     .resumen-multi.active{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
     .resumen-card{ max-width:500px; }
     .mini-mapa{ max-width:400px; }
   }
+
   @media(max-width:899px){
     body{flex-direction:column;}
     .sidebar{flex-direction:row;width:100%;gap:10px;overflow-x:auto;}
     .btn-piso{width:auto;}
     .main{padding:12px;}
-    /* ===== Compactar Resumen: 3 columnas y pasillo angosto ===== */
-.resumen-multi.active{
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.resumen-card{
-  max-width: 460px;
-  padding: 12px;
-}
-
-.mini-mapa{
-  max-width: 360px;
-  padding: 12px;
-  gap: 18px;
-}
-
-.mini .pasillo{ 
-  gap: 26px;
-}
-    /* === FORCE 3 COLS (1366px laptops) — súper compacto === */
-@media (min-width:1200px) and (max-width:1440px){
-  .resumen-multi.active{
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 10px !important;
+    .resumen-multi.active{ grid-template-columns:1fr; }
   }
-  .resumen-card{
-    max-width: 420px !important;
-    padding: 10px !important;
-  }
-  .mini-mapa{
-    max-width: 310px !important;
-    padding: 10px !important;
-    gap: 14px !important;
-  }
-  .mini .pasillo{ 
-    gap: 18px !important;   /* pasillo angosto */
-  }
-}
 
-/* Afinado extra (opcional) */
-@media (min-width:1200px) and (max-width:1440px){
-  .resumen-card h3{ font-size:16px !important; }
-  .resumen-card .kpis{ margin-bottom:6px !important; }
-}
+  /* ===== Laptop 1366–1440px: forzar 3 columnas y pasillo angosto ===== */
+  @media (min-width:1200px) and (max-width:1440px){
+    .resumen-multi.active{
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+      gap: 10px !important;
+      padding: 0 !important;
+    }
+    .resumen-card{
+      max-width: 420px !important;
+      padding: 10px !important;
+      margin: 0 !important;
+      box-shadow: 0 1px 3px rgba(0,0,0,.05) !important;
+    }
+    .mini-mapa{
+      max-width: 310px !important;
+      padding: 10px !important;
+      gap: 14px !important;
+    }
+    .mini .pasillo{ gap: 18px !important; }
+    .resumen-card h3{ font-size:16px !important; margin-bottom:6px !important; }
+    .resumen-card .kpis{ gap:6px !important; margin-bottom:6px !important; }
+  }
 
+  /* Compacto extremo (si aún no entran 3) */
+  @media (min-width:1200px) and (max-width:1440px){
+    .resumen-multi.active{ gap: 8px !important; }
+    .resumen-card{ max-width: 380px !important; padding: 8px !important; }
+    .mini-mapa{ max-width: 280px !important; padding: 8px !important; gap: 12px !important; }
+    .mini .pasillo{ gap: 14px !important; }
+    .mini .habitacion{ width:70px !important; height:54px !important; }
+  }
 </style>
 </head>
 
@@ -207,6 +198,7 @@
   <button class="btn-piso" data-piso="resumen">📊 Resumen (2–4)</button>
 </div>
 
+<!-- Main -->
 <div class="main">
   <div id="piso2" class="piso active"></div>
   <div id="piso3" class="piso"></div>
@@ -215,14 +207,13 @@
   <div id="resumenView" class="resumen-multi"></div>
 </div>
 
-<!-- Menú colores -->
+<!-- Menú de colores -->
 <div class="menu-colores" id="menu">
   <div class="color-opcion" data-color="verde"   style="background:var(--verde)"   title="Vacío limpio (VL)"></div>
   <div class="color-opcion" data-color="naranja" style="background:var(--naranja)" title="Vacío sucio (VS)"></div>
   <div class="color-opcion" data-color="amarillo"style="background:var(--amarillo)"title="Ocupado (OC)"></div>
   <div class="color-opcion" data-color="rojo"    style="background:var(--rojo)"    title="Bloqueado (BL)"></div>
 </div>
-
 <!-- === Firebase + Realtime === -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
@@ -240,17 +231,19 @@
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
+  // Rutas collections
   const HOTEL_ID = "lord-pierre";
   const roomsCol = collection(db, "hotels", HOTEL_ID, "rooms");
   const auditCol = collection(db, "hotels", HOTEL_ID, "audit");
 
+  // Utilidad: nombre de operador (obligatorio para escribir)
   function getStaffName() {
     const by = localStorage.getItem("staffName");
     if (!by || by.trim().length < 2) throw new Error("OPERADOR_REQUERIDO");
     return by.trim();
   }
 
-  // Escritura centralizada con auditoría
+  // Escritura con auditoría
   window.syncRoom = async (roomId, data) => {
     const by = getStaffName();
     const payload = { ...data, updatedBy: by, updatedAt: serverTimestamp() };
@@ -258,15 +251,17 @@
     await addDoc(auditCol, { roomId: String(roomId), by, at: serverTimestamp(), data });
   };
 
+  // Atajo
   window.setRoomStatus = async (roomId, status) => window.syncRoom(roomId, { status });
 
+  // Realtime → delega al renderer de la app
   onSnapshot(roomsCol, (snap) => {
     const rooms = []; snap.forEach((d) => rooms.push({ id: d.id, ...d.data() }));
-    if (window.renderRooms) window.renderRooms(rooms); // se define en PARTE 2
+    if (window.renderRooms) window.renderRooms(rooms);
   });
 </script>
 
-<!-- === Lógica de interfaz — PARTE 1/2 === -->
+<!-- === LÓGICA DE INTERFAZ === -->
 <script>
 /* ================== Datos base ================== */
 const pisos={2:{inicio:200,fin:221},3:{inicio:300,fin:319},4:{inicio:400,fin:421}};
@@ -290,7 +285,7 @@ function pintarOperadorEnResumen(){const name=localStorage.getItem("staffName");
 function safeReadAll(){ try{ return JSON.parse(localStorage.getItem("datosHabitaciones")) || {2:{},3:{},4:{}}; }catch{ return {2:{},3:{},4:{}}; } }
 function safeWrite(piso,num,data){ const all=safeReadAll(); if(!all[piso]) all[piso]={}; all[piso][num]={...(all[piso][num]||{}),...data}; localStorage.setItem("datosHabitaciones",JSON.stringify(all)); }
 function obtenerColor(h){ return [...h.classList].find(c=>Object.keys(COLOR_MAP).includes(c))||"verde"; }
-function setEtiqueta(h,color){ h.querySelector(".estado-label").textContent=COLOR_MAP[color].sigla; }
+function setEtiqueta(h,color){ const e=h.querySelector(".estado-label"); if(e) e.textContent=COLOR_MAP[color].sigla; }
 function syncStar(h,nota){ const prev=h.querySelector(".estrella-nota"); if(prev) prev.remove(); if(nota && nota.trim()){ const s=document.createElement("span"); s.className="estrella-nota"; s.textContent="★"; h.appendChild(s);} }
 const ahoraStr = ()=> new Date().toLocaleString();
 
@@ -501,7 +496,7 @@ function agregarFilaCama(p,cantidad="",tipo=""){
   if(tabla) tabla.appendChild(tr);
 }
 
-/* ====== KPIs + mini mapas ====== */
+/* ====== KPIs + mini mapas (Resumen) ====== */
 function contarPorColor(piso){
   const all = safeReadAll()?.[piso] || {};
   const counts = {verde:0,naranja:0,amarillo:0,rojo:0};
@@ -585,7 +580,7 @@ function renderResumenGlobal(){
   });
 }
 
-/* ====== Resumen (throttle) ====== */
+/* ====== Resumen (throttle + reloj) ====== */
 let needsResumen=true;
 function solicitarResumen(){ needsResumen=true; }
 function actualizarResumen(){
@@ -618,8 +613,7 @@ setInterval(()=>{ if(needsResumen){ actualizarResumen(); needsResumen=false; } c
 [2,3,4].forEach(crearPiso);
 pintarOperadorEnResumen();
 lockUI(!hasOperator());
-</script>
-<script>
+
 /* ================== Navegación de pisos (incluye modo Resumen) ================== */
 document.querySelectorAll(".btn-piso").forEach(btn=>{
   btn.addEventListener("click",()=>{
@@ -633,15 +627,15 @@ document.querySelectorAll(".btn-piso").forEach(btn=>{
     menu.style.display="none";
 
     if(key === "resumen"){
-      // Activa tablero con 3 tarjetas y mapas compactos
+      // Tablero con 3 tarjetas y mini-mapas
       window.modoResumen = true;
       document.querySelectorAll(".piso").forEach(p=>p.classList.remove("active"));
       document.getElementById("resumenView").classList.add("active");
       window.habitacionSeleccionada = null;
-      renderResumenGlobal();              // construye tarjetas y mini-mapas
-      lockUI(!hasOperator());             // respeta bloqueo si falta operador
+      renderResumenGlobal();
+      lockUI(!hasOperator());
     } else {
-      // Vuelve a vista por piso
+      // Vista por piso
       window.modoResumen = false;
       document.getElementById("resumenView").classList.remove("active");
 
@@ -683,11 +677,11 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
     const p     = pisoActivo;
     const num   = habitacionSeleccionada.dataset.num;
 
-    // Aplica color en UI (big o mini, depende de dónde hiciste click)
+    // Aplica color en UI (big o mini)
     habitacionSeleccionada.className=`habitacion ${color}`;
     setEtiqueta(habitacionSeleccionada,color);
 
-    // Persiste en cache local manteniendo datos existentes
+    // Cache local manteniendo datos existentes
     const prev = safeReadAll()?.[p]?.[num] || {};
     safeWrite(p, num, {
       color,
@@ -702,13 +696,13 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
     solicitarResumen();
     menu.style.display="none";
 
-    // Si estás en Resumen: actualiza KPIs y el recuadro de ese piso
+    // Si estás en Resumen: KPIs y recuadro
     if(modoResumen){
       pintarKpis(p);
       actualizarMiniResumen(p);
     }
 
-    // Sincroniza en Firestore
+    // Sincroniza Firestore
     try { await window.syncRoom(num, { status: color }); }
     catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); console.warn(e); }
   });
@@ -760,6 +754,6 @@ window.renderRooms = (rooms) => {
   });
 };
 </script>
+
 </body>
 </html>
-
