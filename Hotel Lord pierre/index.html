@@ -167,7 +167,48 @@
     .sidebar{flex-direction:row;width:100%;gap:10px;overflow-x:auto;}
     .btn-piso{width:auto;}
     .main{padding:12px;}
-  }
+  
+  /* ====== FIX: Resumen 3 columnas, tamaño normal y pasillo compacto ====== */
+.resumen-multi.active{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* fuerza 3 tarjetas por fila en desktop */
+  gap: 20px;
+  align-items: start;
+}
+
+/* Limita el ancho del card y del mini-mapa para que no se estiren */
+.resumen-card{ width:100%; max-width: 500px; margin: 0 auto; }
+.mini-mapa{
+  max-width: 420px;           /* prueba 400–460 según tu gusto */
+  margin: 0 auto 10px;
+  padding: 16px;
+  border-radius: 14px;
+  background: #4b5563;
+  display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;
+}
+
+/* Habitaciones tamaño normal */
+.mini .habitacion{ width:70px; height:54px; border-radius:14px; font-size:14px; }
+.mini .estado-label{ font-size:11px; }
+
+/* Pasillo más angosto (compacto) */
+.mini .pasillo{ gap:48px; }   /* si quieres aún más compacto: 40px */
+
+/* KPIs en una línea (scroll si no caben) */
+.resumen-card .kpis{
+  display: flex; gap: 8px; overflow-x: auto; white-space: nowrap; padding-bottom: 4px;
+}
+
+/* Responsivo: cae a 2 y 1 columna según ancho */
+@media (max-width: 1500px){
+  .resumen-multi.active{ grid-template-columns: repeat(2, 1fr); }
+  .mini-mapa{ max-width: 400px; }
+}
+@media (max-width: 900px){
+  .resumen-multi.active{ grid-template-columns: 1fr; }
+  .mini-mapa{ max-width: 420px; }
+}
+
 </style>
 </head>
 
