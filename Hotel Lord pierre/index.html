@@ -254,15 +254,22 @@ function clearOperator(){
   lockUI(true);
 }
 function lockUI(block){
-  // desactivar botones de modificación y menú de colores si no hay operador
-  const disabled = block ? 'add' : 'remove';
-  document.querySelectorAll(".btn.primary, .btn.danger").forEach(b => b.disabled = !!block);
-  if(block) menu.style.display="none";
-  // mapa en gris si bloqueado (solo si quieres feedback visual)
-  document.querySelectorAll(".mapa, .panel .box").forEach(el=>{
-    // La tarjeta de operador no se bloquea
-    if(el.id && el.id.startsWith("opbox")) return;
-    el.classList[disabled]("blocked");
+  const isBlocked = !!block;
+
+  // 1) NUNCA deshabilitar los botones dentro de las cajas de operador (id="opbox…")
+  document.querySelectorAll(".btn.primary, .btn.danger").forEach(b => {
+    const box = b.closest(".box");
+    if (box && box.id && box.id.startsWith("opbox")) return; // deja activos los de operador
+    b.disabled = isBlocked;
+  });
+
+  // 2) Ocultar el menú de colores si está bloqueado
+  if (isBlocked) menu.style.display = "none";
+
+  // 3) Bloqueo visual de paneles y mapa, excepto el cuadro de operador
+  document.querySelectorAll(".mapa, .panel .box").forEach(el => {
+    if (el.id && el.id.startsWith("opbox")) return; // no bloquear la tarjeta de operador
+    el.classList[isBlocked ? "add" : "remove"]("blocked");
   });
 }
 function pintarOperadorEnResumen(){
