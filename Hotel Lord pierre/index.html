@@ -145,7 +145,26 @@
     .sidebar{flex-direction:row;width:100%;gap:10px;overflow-x:auto;}
     .btn-piso{width:auto;}
     .main{padding:12px;}
-    .resumen-multi.active{ grid-template-columns:1fr; }
+    /* ===== Compactar Resumen: 3 columnas y pasillo angosto ===== */
+.resumen-multi.active{
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.resumen-card{
+  max-width: 460px;
+  padding: 12px;
+}
+
+.mini-mapa{
+  max-width: 360px;
+  padding: 12px;
+  gap: 18px;
+}
+
+.mini .pasillo{ 
+  gap: 26px;
+}
   }
 </style>
 </head>
