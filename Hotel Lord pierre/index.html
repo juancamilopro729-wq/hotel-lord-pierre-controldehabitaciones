@@ -424,7 +424,7 @@ function actualizarPanelNota(){
   btnG.onclick=async ()=>{
     if(!hasOperator()){ alert("Identifícate primero."); return; }
     const nota = box.value.trim();
-    safeWrite(p,num,{nota,fecha:ahoraStr()});
+    safeWrite(p,num,{nota,fecha:ahoraStr(),por:localStorage.getItem("staffName")});
     syncStar(habitacionSeleccionada,nota);
     setBadge("✅ Guardado");
     solicitarResumen();
@@ -433,7 +433,7 @@ function actualizarPanelNota(){
   };
   btnE.onclick=async ()=>{
     if(!hasOperator()){ alert("Identifícate primero."); return; }
-    safeWrite(p,num,{nota:"",fecha:ahoraStr()});
+    safeWrite(p, num, { nota: "", fecha: ahoraStr(), por: localStorage.getItem("staffName") });
     box.value=""; syncStar(habitacionSeleccionada,"");
     setBadge("🗑️ Eliminado");
     solicitarResumen();
@@ -480,7 +480,7 @@ function actualizarPanelCamas(){
       cantidad:tr.querySelector("input").value,
       tipo:tr.querySelector("select").value
     })).filter(x=>x.cantidad && x.tipo);
-    safeWrite(p,num,{camas:filas,fecha:ahoraStr()});
+    safeWrite(p,num,{camas:filas,fecha:ahoraStr(),por:localStorage.getItem("staffName")});
     setBadge("✅ Guardado");
     solicitarResumen();
     try { await window.syncRoom(num, { beds: filas }); }
@@ -488,7 +488,7 @@ function actualizarPanelCamas(){
   };
   btnE.onclick=async ()=>{
     if(!hasOperator()){ alert("Identifícate primero."); return; }
-    safeWrite(p,num,{camas:[],fecha:ahoraStr()});
+    safeWrite(p,num,{camas:[],fecha:ahoraStr(),por:localStorage.getItem("staffName")});
     tabla.innerHTML="";
     setBadge("🗑️ Eliminado");
     solicitarResumen();
@@ -543,14 +543,16 @@ function actualizarResumen(){
   const notaTxt=saved.nota?saved.nota:"—";
   const fechaTxt=saved.fecha?saved.fecha:"Sin registrar";
   const operadorActivo = localStorage.getItem("staffName") || "—";
+  const modifico = saved.por || "—"; 
 
-  resumen.innerHTML=`
-    <p><strong>Operador activo:</strong> ${operadorActivo}</p>
-    <p><strong>Habitación:</strong> ${num}</p>
-    <p><strong>Estado:</strong> ${meta.label}</p>
-    <p><strong>Camas:</strong> ${camasTxt}</p>
-    <p><strong>Última nota:</strong> ${notaTxt}</p>
-    <p><strong>Última modificación:</strong> ${fechaTxt}</p>`;
+ resumen.innerHTML=`
+  <p><strong>Operador activo:</strong> ${operadorActivo}</p>
+  <p><strong>Habitación:</strong> ${num}</p>
+  <p><strong>Estado:</strong> ${meta.label}</p>
+  <p><strong>Camas:</strong> ${camasTxt}</p>
+  <p><strong>Última nota:</strong> ${notaTxt}</p>
+  <p><strong>Última modificación:</strong> ${fechaTxt}</p>
+  <p><strong>Última modificación por:</strong> ${modifico}</p>`;
 }
 setInterval(()=>{
   if(needsResumen){ actualizarResumen(); needsResumen=false; }
@@ -577,7 +579,11 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
     setEtiqueta(habitacionSeleccionada,color);
     const p=pisoActivo, num=habitacionSeleccionada.dataset.num;
     const prev=safeReadAll()?.[p]?.[num]||{};
-    safeWrite(p,num,{color,nota:prev.nota,camas:prev.camas,fecha:ahoraStr()});
+    safeWrite(
+      p,
+      num,
+      { color, nota: prev.nota, camas: prev.camas, fecha: ahoraStr(), por: localStorage.getItem("staffName") } // ← AÑADIDO
+    );
     actualizarPanelEstado(); solicitarResumen(); menu.style.display="none";
     try { await window.syncRoom(num, { status: color }); } 
     catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); console.warn(e); }
@@ -611,12 +617,13 @@ window.renderRooms = (rooms) => {
     const nota = r.note || "";
     const camas = r.beds || [];
     const fecha = (r.updatedAt && r.updatedAt.toDate) ? r.updatedAt.toDate().toLocaleString() : ahoraStr();
+    const por   = r.updatedBy || r.by || ""; // << NUEVO
 
     const piso = Number(id[0]); // asumiendo IDs 201, 305, etc.
     if(![2,3,4].includes(piso)) return;
 
     // cache local
-    safeWrite(piso, id, { color: status, nota, camas, fecha });
+    safeWrite(piso, id, { color: status, nota, camas, fecha, por });
 
     // DOM
     const el = document.querySelector(`.piso.active .habitacion[data-num="${id}"]`)
