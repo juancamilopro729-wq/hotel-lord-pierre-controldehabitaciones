@@ -128,32 +128,39 @@
   .hint { font-size:12px; color:#6b7280; margin-top:6px; }
 
   /* === VISTA RESUMEN (3 pisos) === */
-  .resumen-multi{ display:none; width:100%; }
-  .resumen-multi.active{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-    gap:22px; align-items:start;
-  }
-  .resumen-card{
-    background:#fff;border:1px solid var(--borde);
-    border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);
-  }
-  .resumen-card h3{font-size:18px;margin-bottom:10px;}
-  .resumen-card .kpis{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;}
-  .chip{
-    display:inline-flex; align-items:center; gap:6px;
-    padding:6px 8px; border-radius:999px; border:1px solid var(--borde);
-    font-size:12px; background:#f9fafb;
-  }
-  .chip .dot{ width:12px;height:12px;border-radius:3px;border:1px solid #9994;}
+.resumen-multi{ display:none; width:100%; }
+.resumen-multi.active{
+  display:grid;
+  /* ancho mínimo suficiente para que quepan las dos columnas con el pasillo */
+  grid-template-columns:repeat(auto-fit,minmax(520px,1fr));
+  gap:22px; align-items:start;
+}
 
-  .mini .habitacion{ width:48px;height:38px;border-radius:10px;font-size:12px;}
-  .mini .estado-label{font-size:9px;}
-  .mini-mapa{
-    background:#4b5563;padding:12px;border-radius:12px;
-    display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:10px;
-  }
-  .mini .pasillo{ gap:40px; }
+.resumen-card{
+  background:#fff;border:1px solid var(--borde);
+  border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);
+  width:100%;
+}
+.resumen-card h3{font-size:18px;margin-bottom:10px;}
+.resumen-card .kpis{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;}
+.chip{
+  display:inline-flex; align-items:center; gap:6px;
+  padding:6px 8px; border-radius:999px; border:1px solid var(--borde);
+  font-size:12px; background:#f9fafb;
+}
+.chip .dot{ width:12px;height:12px;border-radius:3px;border:1px solid #9994;}
+
+/* <<< IMPORTANTE: mismas dimensiones que el mapa “grande” >>> */
+.mini .habitacion{
+  width:70px;height:54px;border-radius:14px;font-size:14px;
+}
+.mini .estado-label{font-size:11px;}
+.mini-mapa{
+  background:#4b5563;padding:22px;border-radius:14px;
+  display:flex;justify-content:center;gap:28px;flex-wrap:wrap;margin-bottom:10px;
+}
+.mini .pasillo{ gap:80px; }
+
 
   @media(max-width:899px){
     body{flex-direction:column;}
@@ -253,7 +260,7 @@
   });
 </script>
 
-<!-- === Lógica de interfaz — PARTE 1/2 === -->
+<!-- === Lógica de interfaz === -->
 <script>
 /* ================== Datos base ================== */
 const pisos={2:{inicio:200,fin:221},3:{inicio:300,fin:319},4:{inicio:400,fin:421}};
