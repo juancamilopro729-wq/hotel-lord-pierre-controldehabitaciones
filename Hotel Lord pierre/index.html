@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
@@ -113,7 +113,7 @@
   th, td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left;}
   th{background:#f3f4f6;font-weight:700;}
   tr:hover td{background:#f9fafb;}
-  select, input[type="number"]{width:100%;padding:6px;border:1px solid #d1d5db;border-radius:8px;background:#fff;}
+  select, input[type="number"], input[type="text"]{width:100%;padding:6px;border:1px solid #d1d5db;border-radius:8px;background:#fff;}
   .delete-btn{background:none;border:none;color:#ef4444;font-size:16px;cursor:pointer;}
 
   /* Menú de colores */
@@ -122,6 +122,10 @@
     padding:6px; box-shadow:0 0 12px rgba(0,0,0,.2); z-index:1000;
   }
   .color-opcion{width:30px;height:30px;border-radius:6px;margin:6px;display:inline-block;cursor:pointer;border:1px solid #9994;}
+
+  /* Estado bloqueado por falta de operador */
+  .blocked { opacity:.6; pointer-events:none; }
+  .hint { font-size:12px; color:#6b7280; margin-top:6px; }
 
   @media(max-width:899px){
     body{flex-direction:column;}
@@ -181,31 +185,30 @@
   const roomsCol = collection(db, "hotels", HOTEL_ID, "rooms");
   const auditCol = collection(db, "hotels", HOTEL_ID, "audit");
 
-  // Helper para nombre del personal
+  // === Operador (solo lectura aquí; se establece en la UI de la Parte 2)
   function getStaffName() {
-    let by = localStorage.getItem("staffName");
-    if (!by) {
-      by = prompt("Ingresa tu nombre (personal):")?.trim();
-      if (by && by.length >= 3) localStorage.setItem("staffName", by);
-      else throw new Error("Nombre inválido.");
+    const by = localStorage.getItem("staffName");
+    if (!by || by.trim().length < 2) {
+      // No forzamos prompt. La UI de la Parte 2 gestiona esto.
+      throw new Error("OPERADOR_REQUERIDO");
     }
-    return by;
+    return by.trim();
   }
 
-  // Escritura centralizada
+  // Escritura centralizada con auditoría
   window.syncRoom = async (roomId, data) => {
-    const by = getStaffName();
+    const by = getStaffName(); // lanzará error si falta
     const payload = { ...data, updatedBy: by, updatedAt: serverTimestamp() };
     await setDoc(doc(roomsCol, String(roomId)), payload, { merge: true });
     await addDoc(auditCol, { roomId: String(roomId), by, at: serverTimestamp(), data });
   };
 
-  // Atajo compatible con tu UI
+  // Atajo compatible con UI
   window.setRoomStatus = async (roomId, status) => {
     await window.syncRoom(roomId, { status });
   };
 
-  // Refleja cambios remotos en DOM + almacenamiento local
+  // Realtime listener
   function tsToLocalString(ts) {
     try { return ts?.toDate ? ts.toDate().toLocaleString() : new Date().toLocaleString(); }
     catch { return new Date().toLocaleString(); }
@@ -231,6 +234,43 @@ const COLOR_MAP={
 };
 let pisoActivo=2,habitacionSeleccionada=null;
 const menu=document.getElementById("menu");
+
+/* ================== Operador ================== */
+function hasOperator(){ 
+  const n = localStorage.getItem("staffName");
+  return !!(n && n.trim().length>=2);
+}
+function setOperator(name){
+  const clean = (name||"").trim();
+  if(clean.length<2){ alert("Escribe tu nombre (mínimo 2 caracteres)."); return false; }
+  localStorage.setItem("staffName", clean);
+  pintarOperadorEnResumen();
+  lockUI(false);
+  return true;
+}
+function clearOperator(){
+  localStorage.removeItem("staffName");
+  pintarOperadorEnResumen();
+  lockUI(true);
+}
+function lockUI(block){
+  // desactivar botones de modificación y menú de colores si no hay operador
+  const disabled = block ? 'add' : 'remove';
+  document.querySelectorAll(".btn.primary, .btn.danger").forEach(b => b.disabled = !!block);
+  if(block) menu.style.display="none";
+  // mapa en gris si bloqueado (solo si quieres feedback visual)
+  document.querySelectorAll(".mapa, .panel .box").forEach(el=>{
+    // La tarjeta de operador no se bloquea
+    if(el.id && el.id.startsWith("opbox")) return;
+    el.classList[disabled]("blocked");
+  });
+}
+function pintarOperadorEnResumen(){
+  const name = localStorage.getItem("staffName");
+  document.querySelectorAll("[data-operator-chip]").forEach(el=>{
+    el.textContent = name ? `Operador: ${name}` : "Operador: —";
+  });
+}
 
 /* ================== Utilidades ================== */
 function safeReadAll(){
@@ -258,6 +298,18 @@ function crearPiso(piso){
   <div class="contenedor">
     <!-- Panel izquierdo -->
     <div class="panel">
+      <!-- === Caja de operador (zona azul que pediste) === -->
+      <div class="box" id="opbox${piso}">
+        <h3>👤 Identifícate</h3>
+        <input type="text" id="opInput${piso}" placeholder="Nombre del operador (obligatorio)"/>
+        <div class="actions">
+          <button id="opGuardar${piso}" class="btn primary">Usar este nombre</button>
+          <button id="opBorrar${piso}" class="btn">Cambiar</button>
+          <span class="badge" data-operator-chip></span>
+        </div>
+        <div class="hint">Necesitas identificarte para guardar, eliminar o cambiar colores.</div>
+      </div>
+
       <div class="box">
         <h3>🛏️ Configuración de camas</h3>
         <table id="tablaCamas${piso}">
@@ -275,6 +327,7 @@ function crearPiso(piso){
       </div>
       <div class="box">
         <h3>📊 Resumen de habitación</h3>
+        <div class="hint" data-operator-chip></div>
         <div id="reloj${piso}" class="reloj"></div>
         <div id="resumenContenido${piso}" class="resumen"><p>Selecciona una habitación...</p></div>
       </div>
@@ -302,6 +355,19 @@ function crearPiso(piso){
       <div class="box"><div class="estado"><span class="swatch" id="swatch${piso}"></span><span id="estadoTexto${piso}">Sin selección.</span></div></div>
     </div>
   </div>`;
+
+  // listeners de operador
+  document.getElementById(`opGuardar${piso}`).onclick = () => {
+    const val = document.getElementById(`opInput${piso}`).value;
+    if(setOperator(val)){
+      // habilitar controles del piso activo
+      seleccionarHabitacion(habitacionSeleccionada || document.querySelector(`#piso${piso} .habitacion`), piso);
+    }
+  };
+  document.getElementById(`opBorrar${piso}`).onclick = () => {
+    clearOperator();
+  };
+
   crearHabitaciones(piso);
 }
 
@@ -326,6 +392,7 @@ function crearHabitaciones(piso){
 
 /* ================== Interacción ================== */
 function seleccionarHabitacion(h,piso){
+  if(!h) return;
   document.querySelectorAll(`#piso${piso} .habitacion.selected`).forEach(x=>x.classList.remove("selected"));
   habitacionSeleccionada=h; pisoActivo=piso; h.classList.add("selected");
   actualizarPanelNota(); actualizarPanelEstado(); actualizarPanelCamas(); solicitarResumen();
@@ -348,21 +415,23 @@ function actualizarPanelNota(){
   const setBadge=m=>{ badge.textContent=m; setTimeout(()=>badge.textContent="",1200); };
 
   btnG.onclick=async ()=>{
+    if(!hasOperator()){ alert("Identifícate primero."); return; }
     const nota = box.value.trim();
     safeWrite(p,num,{nota,fecha:ahoraStr()});
     syncStar(habitacionSeleccionada,nota);
     setBadge("✅ Guardado");
     solicitarResumen();
-    // 🔄 Firestore
-    try { await window.syncRoom(num, { note: nota }); } catch(e){ console.warn(e); }
+    try { await window.syncRoom(num, { note: nota }); } 
+    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); console.warn(e); }
   };
   btnE.onclick=async ()=>{
+    if(!hasOperator()){ alert("Identifícate primero."); return; }
     safeWrite(p,num,{nota:"",fecha:ahoraStr()});
     box.value=""; syncStar(habitacionSeleccionada,"");
     setBadge("🗑️ Eliminado");
     solicitarResumen();
-    // 🔄 Firestore
-    try { await window.syncRoom(num, { note: "" }); } catch(e){ console.warn(e); }
+    try { await window.syncRoom(num, { note: "" }); } 
+    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); console.warn(e); }
   };
 }
 
@@ -399,6 +468,7 @@ function actualizarPanelCamas(){
   btnAdd.onclick=()=>agregarFilaCama(p,"","");
 
   btnG.onclick=async ()=>{
+    if(!hasOperator()){ alert("Identifícate primero."); return; }
     const filas=[...tabla.querySelectorAll("tr")].map(tr=>({
       cantidad:tr.querySelector("input").value,
       tipo:tr.querySelector("select").value
@@ -406,16 +476,17 @@ function actualizarPanelCamas(){
     safeWrite(p,num,{camas:filas,fecha:ahoraStr()});
     setBadge("✅ Guardado");
     solicitarResumen();
-    // 🔄 Firestore
-    try { await window.syncRoom(num, { beds: filas }); } catch(e){ console.warn(e); }
+    try { await window.syncRoom(num, { beds: filas }); }
+    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); console.warn(e); }
   };
   btnE.onclick=async ()=>{
+    if(!hasOperator()){ alert("Identifícate primero."); return; }
     safeWrite(p,num,{camas:[],fecha:ahoraStr()});
     tabla.innerHTML="";
     setBadge("🗑️ Eliminado");
     solicitarResumen();
-    // 🔄 Firestore
-    try { await window.syncRoom(num, { beds: [] }); } catch(e){ console.warn(e); }
+    try { await window.syncRoom(num, { beds: [] }); }
+    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); console.warn(e); }
   };
 }
 
@@ -464,8 +535,10 @@ function actualizarResumen(){
     : "Sin registrar";
   const notaTxt=saved.nota?saved.nota:"—";
   const fechaTxt=saved.fecha?saved.fecha:"Sin registrar";
+  const operadorActivo = localStorage.getItem("staffName") || "—";
 
   resumen.innerHTML=`
+    <p><strong>Operador activo:</strong> ${operadorActivo}</p>
     <p><strong>Habitación:</strong> ${num}</p>
     <p><strong>Estado:</strong> ${meta.label}</p>
     <p><strong>Camas:</strong> ${camasTxt}</p>
@@ -480,6 +553,7 @@ setInterval(()=>{
 
 /* ================== Menú colores ================== */
 function abrirMenu(e){
+  if(!hasOperator()){ alert("Identifícate primero."); return; }
   menu.style.left=`${e.clientX+10}px`;
   menu.style.top=`${e.clientY+10}px`;
   menu.style.display="block";
@@ -490,6 +564,7 @@ window.addEventListener("click",e=>{
 menu.querySelectorAll(".color-opcion").forEach(opt=>{
   opt.addEventListener("click",async ()=>{
     if(!habitacionSeleccionada) return;
+    if(!hasOperator()){ alert("Identifícate primero."); return; }
     const color=opt.dataset.color;
     habitacionSeleccionada.className=`habitacion ${color}`;
     setEtiqueta(habitacionSeleccionada,color);
@@ -497,8 +572,8 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
     const prev=safeReadAll()?.[p]?.[num]||{};
     safeWrite(p,num,{color,nota:prev.nota,camas:prev.camas,fecha:ahoraStr()});
     actualizarPanelEstado(); solicitarResumen(); menu.style.display="none";
-    // 🔄 Firestore (estado)
-    try { await window.syncRoom(num, { status: color }); } catch(e){ console.warn(e); }
+    try { await window.syncRoom(num, { status: color }); } 
+    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); console.warn(e); }
   });
 });
 
@@ -518,6 +593,8 @@ document.querySelectorAll(".btn-piso").forEach(btn=>{
 
 /* ================== Inicialización + render remoto ================== */
 [2,3,4].forEach(crearPiso);
+pintarOperadorEnResumen();
+lockUI(!hasOperator());
 
 // Recibe rooms desde Firestore y actualiza DOM + local cache
 window.renderRooms = (rooms) => {
@@ -544,7 +621,6 @@ window.renderRooms = (rooms) => {
     }
   });
 
-  // Si hay una habitación seleccionada, refresca paneles
   if(habitacionSeleccionada){
     actualizarPanelNota(); actualizarPanelEstado(); solicitarResumen();
   }
