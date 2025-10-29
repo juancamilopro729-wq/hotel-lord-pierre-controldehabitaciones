@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
@@ -19,29 +19,29 @@
   *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;}
   body{background:#f9fafb;display:flex;height:100vh;overflow:hidden;}
 
- /* Logo fijo discreto */
-.logo-fijo {
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  z-index: 50;
-  opacity: 0.6;
-  transition: opacity 0.3s ease;
-}
-.logo-fijo:hover { opacity: 1; }
-.logo-fijo img {
-  height: 50px;
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
-  pointer-events: none;
-  user-select: none;
-}
+  /* Logo fijo discreto */
+  .logo-fijo {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    z-index: 50;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+  }
+  .logo-fijo:hover { opacity: 1; }
+  .logo-fijo img {
+    height: 50px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+    pointer-events: none;
+    user-select: none;
+  }
 
   /* Sidebar pisos */
   .sidebar{
     background:var(--gris-panel);
-    width:200px; display:flex; flex-direction:column; align-items:center;
+    width:220px; display:flex; flex-direction:column; align-items:center;
     gap:14px; padding:20px 12px; border-right:1px solid var(--borde);
     overflow-y:auto;
   }
@@ -56,7 +56,7 @@
   /* Main */
   .main{
     flex:1; display:flex; flex-direction:column; align-items:center;
-    padding:18px; overflow-y:auto;
+    padding:18px; overflow-y:auto; position:relative;
   }
   .piso{
     opacity:0; transform:translateX(100%); position:absolute; transition:.45s ease;
@@ -127,6 +127,34 @@
   .blocked { opacity:.6; pointer-events:none; }
   .hint { font-size:12px; color:#6b7280; margin-top:6px; }
 
+  /* === VISTA RESUMEN (3 pisos) === */
+  .resumen-multi{ display:none; width:100%; }
+  .resumen-multi.active{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:22px; align-items:start;
+  }
+  .resumen-card{
+    background:#fff;border:1px solid var(--borde);
+    border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);
+  }
+  .resumen-card h3{font-size:18px;margin-bottom:10px;}
+  .resumen-card .kpis{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px;}
+  .chip{
+    display:inline-flex; align-items:center; gap:6px;
+    padding:6px 8px; border-radius:999px; border:1px solid var(--borde);
+    font-size:12px; background:#f9fafb;
+  }
+  .chip .dot{ width:12px;height:12px;border-radius:3px;border:1px solid #9994;}
+
+  .mini .habitacion{ width:48px;height:38px;border-radius:10px;font-size:12px;}
+  .mini .estado-label{font-size:9px;}
+  .mini-mapa{
+    background:#4b5563;padding:12px;border-radius:12px;
+    display:flex;justify-content:center;gap:16px;flex-wrap:wrap;margin-bottom:10px;
+  }
+  .mini .pasillo{ gap:40px; }
+
   @media(max-width:899px){
     body{flex-direction:column;}
     .sidebar{flex-direction:row;width:100%;gap:10px;overflow-x:auto;}
@@ -148,12 +176,16 @@
   <button class="btn-piso active" data-piso="2">🏨 Piso 2</button>
   <button class="btn-piso" data-piso="3">🏨 Piso 3</button>
   <button class="btn-piso" data-piso="4">🏨 Piso 4</button>
+  <button class="btn-piso" data-piso="resumen">📊 Resumen (2–4)</button>
 </div>
 
 <div class="main">
   <div id="piso2" class="piso active"></div>
   <div id="piso3" class="piso"></div>
   <div id="piso4" class="piso"></div>
+
+  <!-- Contenedor de la vista Resumen -->
+  <div id="resumenView" class="resumen-multi"></div>
 </div>
 
 <!-- Menú colores -->
@@ -189,7 +221,6 @@
   function getStaffName() {
     const by = localStorage.getItem("staffName");
     if (!by || by.trim().length < 2) {
-      // No forzamos prompt. La UI de la Parte 2 gestiona esto.
       throw new Error("OPERADOR_REQUERIDO");
     }
     return by.trim();
@@ -217,12 +248,12 @@
   onSnapshot(roomsCol, (snap) => {
     const rooms = [];
     snap.forEach((d) => rooms.push({ id: d.id, ...d.data() }));
-    if (window.renderRooms) window.renderRooms(rooms);
+    if (window.renderRooms) window.renderRooms(rooms); // se define en PARTE 2
     console.log("Realtime rooms:", rooms);
   });
 </script>
 
-<!-- === Tu lógica de interfaz === -->
+<!-- === Lógica de interfaz — PARTE 1/2 === -->
 <script>
 /* ================== Datos base ================== */
 const pisos={2:{inicio:200,fin:221},3:{inicio:300,fin:319},4:{inicio:400,fin:421}};
@@ -233,6 +264,7 @@ const COLOR_MAP={
   rojo:{label:'Bloqueado',sigla:'BL'}
 };
 let pisoActivo=2,habitacionSeleccionada=null;
+let modoResumen=false;
 const menu=document.getElementById("menu");
 
 /* ================== Operador ================== */
@@ -256,19 +288,19 @@ function clearOperator(){
 function lockUI(block){
   const isBlocked = !!block;
 
-  // 1) NUNCA deshabilitar los botones dentro de las cajas de operador (id="opbox…")
+  // 1) No deshabilitar botones dentro de las cajas de operador
   document.querySelectorAll(".btn.primary, .btn.danger").forEach(b => {
     const box = b.closest(".box");
-    if (box && box.id && box.id.startsWith("opbox")) return; // deja activos los de operador
+    if (box && box.id && box.id.startsWith("opbox")) return;
     b.disabled = isBlocked;
   });
 
-  // 2) Ocultar el menú de colores si está bloqueado
+  // 2) Ocultar menú de colores si está bloqueado
   if (isBlocked) menu.style.display = "none";
 
   // 3) Bloqueo visual de paneles y mapa, excepto el cuadro de operador
   document.querySelectorAll(".mapa, .panel .box").forEach(el => {
-    if (el.id && el.id.startsWith("opbox")) return; // no bloquear la tarjeta de operador
+    if (el.id && el.id.startsWith("opbox")) return;
     el.classList[isBlocked ? "add" : "remove"]("blocked");
   });
 }
@@ -305,7 +337,7 @@ function crearPiso(piso){
   <div class="contenedor">
     <!-- Panel izquierdo -->
     <div class="panel">
-      <!-- === Caja de operador (zona azul que pediste) === -->
+      <!-- === Caja de operador === -->
       <div class="box" id="opbox${piso}">
         <h3>👤 Identifícate</h3>
         <input type="text" id="opInput${piso}" placeholder="Nombre del operador (obligatorio)"/>
@@ -363,11 +395,10 @@ function crearPiso(piso){
     </div>
   </div>`;
 
-  // listeners de operador
+  // listeners de operador (no dependen de PARTE 2)
   document.getElementById(`opGuardar${piso}`).onclick = () => {
     const val = document.getElementById(`opInput${piso}`).value;
     if(setOperator(val)){
-      // habilitar controles del piso activo
       seleccionarHabitacion(habitacionSeleccionada || document.querySelector(`#piso${piso} .habitacion`), piso);
     }
   };
@@ -391,13 +422,14 @@ function crearHabitaciones(piso){
       if(saved.color){ h.className=`habitacion ${saved.color}`; setEtiqueta(h,saved.color); }
       if(saved.nota){ syncStar(h,saved.nota); }
     }
-    h.onclick=e=>{ e.stopPropagation(); seleccionarHabitacion(h,piso); abrirMenu(e); };
+    // abrirMenu se define en PARTE 2
+    h.onclick=e=>{ e.stopPropagation(); seleccionarHabitacion(h,piso); if(window.abrirMenu) abrirMenu(e); };
     (n%2===0?colP:colI).appendChild(h);
   }
   const wrap=document.createElement("div"); wrap.className="pasillo"; wrap.append(colP,colI); mapa.appendChild(wrap);
 }
 
-/* ================== Interacción ================== */
+/* ================== Interacción (paneles) ================== */
 function seleccionarHabitacion(h,piso){
   if(!h) return;
   document.querySelectorAll(`#piso${piso} .habitacion.selected`).forEach(x=>x.classList.remove("selected"));
@@ -447,8 +479,10 @@ function actualizarPanelEstado(){
   const num=habitacionSeleccionada.dataset.num;
   const color=obtenerColor(habitacionSeleccionada);
   const meta=COLOR_MAP[color];
-  document.getElementById(`estadoTexto${p}`).textContent=`Habitación ${num} — ${meta.label}.`;
-  document.getElementById(`swatch${p}`).style.background=getComputedStyle(document.documentElement).getPropertyValue(`--${color}`);
+  const et=document.getElementById(`estadoTexto${p}`);
+  const sw=document.getElementById(`swatch${p}`);
+  if(et) et.textContent=`Habitación ${num} — ${meta.label}.`;
+  if(sw) sw.style.background=getComputedStyle(document.documentElement).getPropertyValue(`--${color}`);
 }
 
 function actualizarPanelCamas(){
@@ -460,21 +494,23 @@ function actualizarPanelCamas(){
   const btnAdd=document.getElementById(`agregarCama${p}`);
 
   if(!habitacionSeleccionada){
-    tabla.innerHTML=""; [btnG,btnE,btnAdd].forEach(b=>b.disabled=true); return;
+    if(tabla) tabla.innerHTML=""; [btnG,btnE,btnAdd].forEach(b=>b && (b.disabled=true)); return;
   }
-  [btnG,btnE,btnAdd].forEach(b=>b.disabled=false);
+  [btnG,btnE,btnAdd].forEach(b=>b && (b.disabled=false));
 
   const num=habitacionSeleccionada.dataset.num;
   const saved=safeReadAll()?.[p]?.[num]||{};
   const camas=saved.camas||[];
-  tabla.innerHTML="";
-  camas.forEach(c=>agregarFilaCama(p,c.cantidad,c.tipo));
+  if(tabla){
+    tabla.innerHTML="";
+    camas.forEach(c=>agregarFilaCama(p,c.cantidad,c.tipo));
+  }
 
-  const setBadge=m=>{ badge.textContent=m; setTimeout(()=>badge.textContent="",1200); };
+  const setBadge=m=>{ if(badge){ badge.textContent=m; setTimeout(()=>badge.textContent="",1200); } };
 
-  btnAdd.onclick=()=>agregarFilaCama(p,"","");
+  if(btnAdd) btnAdd.onclick=()=>agregarFilaCama(p,"","");
 
-  btnG.onclick=async ()=>{
+  if(btnG) btnG.onclick=async ()=>{
     if(!hasOperator()){ alert("Identifícate primero."); return; }
     const filas=[...tabla.querySelectorAll("tr")].map(tr=>({
       cantidad:tr.querySelector("input").value,
@@ -486,10 +522,10 @@ function actualizarPanelCamas(){
     try { await window.syncRoom(num, { beds: filas }); }
     catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); console.warn(e); }
   };
-  btnE.onclick=async ()=>{
+  if(btnE) btnE.onclick=async ()=>{
     if(!hasOperator()){ alert("Identifícate primero."); return; }
     safeWrite(p,num,{camas:[],fecha:ahoraStr(),por:localStorage.getItem("staffName")});
-    tabla.innerHTML="";
+    if(tabla) tabla.innerHTML="";
     setBadge("🗑️ Eliminado");
     solicitarResumen();
     try { await window.syncRoom(num, { beds: [] }); }
@@ -515,21 +551,117 @@ function agregarFilaCama(p,cantidad="",tipo=""){
     <td><button class="delete-btn" title="Eliminar fila">×</button></td>
   `;
   tr.querySelector(".delete-btn").onclick=()=>tr.remove();
-  tabla.appendChild(tr);
+  if(tabla) tabla.appendChild(tr);
+}
+
+/* ================== Resumen (KPIs + mini-mapas) ================== */
+function contarPorColor(piso){
+  const all = safeReadAll()?.[piso] || {};
+  const counts = {verde:0,naranja:0,amarillo:0,rojo:0};
+  for(let n=pisos[piso].inicio;n<=pisos[piso].fin;n++){
+    const c = (all[n]?.color) || "verde";
+    counts[c] = (counts[c]||0)+1;
+  }
+  return counts;
+}
+function pintarKpis(piso){
+  const c = contarPorColor(piso);
+  const k = document.getElementById(`kpis${piso}`);
+  if(!k) return;
+  k.innerHTML = `
+    ${['verde','naranja','amarillo','rojo'].map(kc =>
+      `<span class="chip"><span class="dot" style="background:var(--${kc})"></span>${COLOR_MAP[kc].sigla}: <b>${c[kc]}</b></span>`
+    ).join('')}
+    <span class="chip">Total: <b>${Object.values(c).reduce((a,b)=>a+b,0)}</b></span>`;
+}
+function crearMiniHabitaciones(piso){
+  const mapa = document.getElementById(`miniMapa${piso}`); if(!mapa) return;
+  mapa.innerHTML = "";
+  const colP = document.createElement("div"), colI = document.createElement("div");
+  colP.className="columna"; colI.className="columna";
+
+  for(let n=pisos[piso].inicio;n<=pisos[piso].fin;n++){
+    const h=document.createElement("div");
+    h.className="habitacion verde"; h.dataset.num=n;
+    h.innerHTML=`<div>${n}</div><span class="estado-label">VL</span>`;
+    const saved=safeReadAll()?.[piso]?.[n];
+    if(saved){
+      if(saved.color){ h.className=`habitacion ${saved.color}`; setEtiqueta(h,saved.color); }
+      if(saved.nota){ syncStar(h,saved.nota); }
+    }
+    h.onclick=(e)=>{ e.stopPropagation(); seleccionarMini(h,piso); if(window.abrirMenu) abrirMenu(e); };
+    (n%2===0?colP:colI).appendChild(h);
+  }
+  const wrap=document.createElement("div"); wrap.className="pasillo"; wrap.append(colP,colI); mapa.appendChild(wrap);
+}
+function seleccionarMini(h,piso){
+  document.querySelectorAll(`#miniMapa${piso} .habitacion.selected`).forEach(x=>x.classList.remove("selected"));
+  habitacionSeleccionada=h; pisoActivo=piso; h.classList.add("selected");
+  actualizarMiniResumen(piso);
+}
+function actualizarMiniResumen(piso){
+  const num = habitacionSeleccionada?.dataset?.num;
+  const resumen = document.getElementById(`miniResumen${piso}`);
+  const estadoT = document.getElementById(`miniEstado${piso}`);
+  const swatch  = document.getElementById(`miniSwatch${piso}`);
+
+  if(!num){
+    if(resumen) resumen.innerHTML = "<p>Selecciona una habitación…</p>";
+    if(estadoT) estadoT.textContent = "Selecciona una habitación…";
+    return;
+  }
+  const saved = safeReadAll()?.[piso]?.[num] || {};
+  const color = obtenerColor(habitacionSeleccionada);
+  const meta  = COLOR_MAP[color];
+  if(estadoT) estadoT.textContent = `Habitación ${num} — ${meta.label}.`;
+  if(swatch)  swatch.style.background = getComputedStyle(document.documentElement).getPropertyValue(`--${color}`);
+
+  const camasTxt = (saved.camas && saved.camas.length) ? saved.camas.map(c=>`${c.cantidad} ${c.tipo}`).join(", ") : "Sin registrar";
+  const notaTxt  = saved.nota || "—";
+  const fechaTxt = saved.fecha || "Sin registrar";
+  const porTxt   = saved.por || "—";
+  if(resumen){
+    resumen.innerHTML = `
+      <p><strong>Camas:</strong> ${camasTxt}</p>
+      <p><strong>Nota:</strong> ${notaTxt}</p>
+      <p><strong>Últ. mod.:</strong> ${fechaTxt} <em>por</em> ${porTxt}</p>`;
+  }
+}
+function renderResumenGlobal(){
+  const wrap = document.getElementById("resumenView");
+  if(!wrap) return;
+  wrap.innerHTML = "";
+  [2,3,4].forEach(p=>{
+    const card = document.createElement("div");
+    card.className = "resumen-card mini";
+    card.innerHTML = `
+      <h3>piso número ${p}</h3>
+      <div class="kpis" id="kpis${p}"></div>
+      <div class="mini-mapa" id="miniMapa${p}"></div>
+      <div class="box">
+        <div class="estado">
+          <span class="swatch" id="miniSwatch${p}"></span>
+          <span id="miniEstado${p}">Selecciona una habitación…</span>
+        </div>
+        <div id="miniResumen${p}" class="resumen"><p>—</p></div>
+      </div>`;
+    wrap.appendChild(card);
+    crearMiniHabitaciones(p);
+    pintarKpis(p);
+  });
 }
 
 /* ================== Resumen (throttle) ================== */
 let needsResumen=true;
 function solicitarResumen(){ needsResumen=true; }
-
 function actualizarResumen(){
   const p=pisoActivo;
   const resumen=document.getElementById(`resumenContenido${p}`);
   const reloj=document.getElementById(`reloj${p}`);
-  reloj.textContent=new Date().toLocaleTimeString();
+  if(reloj) reloj.textContent=new Date().toLocaleTimeString();
 
   if(!habitacionSeleccionada){
-    resumen.innerHTML="<p>Selecciona una habitación...</p>";
+    if(resumen) resumen.innerHTML="<p>Selecciona una habitación...</p>";
     return;
   }
   const num=habitacionSeleccionada.dataset.num;
@@ -545,14 +677,14 @@ function actualizarResumen(){
   const operadorActivo = localStorage.getItem("staffName") || "—";
   const modifico = saved.por || "—"; 
 
- resumen.innerHTML=`
-  <p><strong>Operador activo:</strong> ${operadorActivo}</p>
-  <p><strong>Habitación:</strong> ${num}</p>
-  <p><strong>Estado:</strong> ${meta.label}</p>
-  <p><strong>Camas:</strong> ${camasTxt}</p>
-  <p><strong>Última nota:</strong> ${notaTxt}</p>
-  <p><strong>Última modificación:</strong> ${fechaTxt}</p>
-  <p><strong>Última modificación por:</strong> ${modifico}</p>`;
+  if(resumen) resumen.innerHTML=`
+    <p><strong>Operador activo:</strong> ${operadorActivo}</p>
+    <p><strong>Habitación:</strong> ${num}</p>
+    <p><strong>Estado:</strong> ${meta.label}</p>
+    <p><strong>Camas:</strong> ${camasTxt}</p>
+    <p><strong>Última nota:</strong> ${notaTxt}</p>
+    <p><strong>Última modificación:</strong> ${fechaTxt}</p>
+    <p><strong>Última modificación por:</strong> ${modifico}</p>`;
 }
 setInterval(()=>{
   if(needsResumen){ actualizarResumen(); needsResumen=false; }
@@ -560,86 +692,154 @@ setInterval(()=>{
   if(reloj) reloj.textContent=new Date().toLocaleTimeString();
 },1000);
 
-/* ================== Menú colores ================== */
-function abrirMenu(e){
-  if(!hasOperator()){ alert("Identifícate primero."); return; }
-  menu.style.left=`${e.clientX+10}px`;
-  menu.style.top=`${e.clientY+10}px`;
-  menu.style.display="block";
-}
-window.addEventListener("click",e=>{
-  if(!menu.contains(e.target) && !e.target.classList.contains("habitacion")) menu.style.display="none";
-});
-menu.querySelectorAll(".color-opcion").forEach(opt=>{
-  opt.addEventListener("click",async ()=>{
-    if(!habitacionSeleccionada) return;
-    if(!hasOperator()){ alert("Identifícate primero."); return; }
-    const color=opt.dataset.color;
-    habitacionSeleccionada.className=`habitacion ${color}`;
-    setEtiqueta(habitacionSeleccionada,color);
-    const p=pisoActivo, num=habitacionSeleccionada.dataset.num;
-    const prev=safeReadAll()?.[p]?.[num]||{};
-    safeWrite(
-      p,
-      num,
-      { color, nota: prev.nota, camas: prev.camas, fecha: ahoraStr(), por: localStorage.getItem("staffName") } // ← AÑADIDO
-    );
-    actualizarPanelEstado(); solicitarResumen(); menu.style.display="none";
-    try { await window.syncRoom(num, { status: color }); } 
-    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); console.warn(e); }
-  });
-});
-
-/* ================== Navegación de pisos ================== */
-document.querySelectorAll(".btn-piso").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    if(btn.classList.contains("active")) return;
-    document.querySelectorAll(".btn-piso").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    const piso=Number(btn.dataset.piso);
-    document.querySelectorAll(".piso").forEach(p=>p.classList.remove("active"));
-    document.getElementById(`piso${piso}`).classList.add("active");
-    pisoActivo=piso; habitacionSeleccionada=null; menu.style.display="none";
-    actualizarPanelNota(); actualizarPanelEstado(); actualizarPanelCamas(); solicitarResumen();
-  });
-});
-
-/* ================== Inicialización + render remoto ================== */
+/* ================== Inicialización mínima (sin listeners de pisos/menú) ================== */
 [2,3,4].forEach(crearPiso);
 pintarOperadorEnResumen();
 lockUI(!hasOperator());
 
-// Recibe rooms desde Firestore y actualiza DOM + local cache
-window.renderRooms = (rooms) => {
-  rooms.forEach(r => {
-    const id = String(r.id);
-    const status = r.status || "verde";
-    const nota = r.note || "";
-    const camas = r.beds || [];
-    const fecha = (r.updatedAt && r.updatedAt.toDate) ? r.updatedAt.toDate().toLocaleString() : ahoraStr();
-    const por   = r.updatedBy || r.by || ""; // << NUEVO
+// Los listeners de botones de piso, el menú de colores y el renderRooms
+// en tiempo real se agregan en la PARTE 2/2.
+</script>
+<!-- === Lógica final — PARTE 2/2 (listeners, menú de colores y realtime) === -->
+<script>
+/* ================== Navegación de pisos (incluye modo Resumen) ================== */
+document.querySelectorAll(".btn-piso").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    if(btn.classList.contains("active")) return;
 
-    const piso = Number(id[0]); // asumiendo IDs 201, 305, etc.
-    if(![2,3,4].includes(piso)) return;
+    document.querySelectorAll(".btn-piso").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    const key = btn.dataset.piso;
 
-    // cache local
-    safeWrite(piso, id, { color: status, nota, camas, fecha, por });
+    // Cierra menú de colores si estuviera abierto
+    menu.style.display="none";
 
-    // DOM
-    const el = document.querySelector(`.piso.active .habitacion[data-num="${id}"]`)
-               || document.querySelector(`.habitacion[data-num="${id}"]`);
-    if(el){
-      el.className = `habitacion ${status}`;
-      setEtiqueta(el, status);
-      syncStar(el, nota);
+    if(key === "resumen"){
+      modoResumen = true;
+      // Oculta pisos y muestra tablero
+      document.querySelectorAll(".piso").forEach(p=>p.classList.remove("active"));
+      document.getElementById("resumenView").classList.add("active");
+      habitacionSeleccionada = null;
+      renderResumenGlobal();
+      lockUI(!hasOperator());
+    } else {
+      modoResumen = false;
+      document.getElementById("resumenView").classList.remove("active");
+
+      const piso = Number(key);
+      document.querySelectorAll(".piso").forEach(p=>p.classList.remove("active"));
+      document.getElementById(`piso${piso}`).classList.add("active");
+
+      pisoActivo = piso;
+      habitacionSeleccionada = null;
+      actualizarPanelNota(); 
+      actualizarPanelEstado(); 
+      actualizarPanelCamas(); 
+      solicitarResumen();
     }
   });
+});
 
-  if(habitacionSeleccionada){
-    actualizarPanelNota(); actualizarPanelEstado(); solicitarResumen();
+/* ================== Menú de colores ================== */
+function abrirMenu(e){
+  if(!hasOperator()){ alert("Identifícate primero."); return; }
+  menu.style.left=`${e.clientX+10}px`;
+  menu.style.top =`${e.clientY+10}px`;
+  menu.style.display="block";
+}
+window.abrirMenu = abrirMenu;
+
+window.addEventListener("click",e=>{
+  if(!menu.contains(e.target) && !e.target.classList.contains("habitacion")){
+    menu.style.display="none";
   }
+});
+
+menu.querySelectorAll(".color-opcion").forEach(opt=>{
+  opt.addEventListener("click", async ()=>{
+    if(!habitacionSeleccionada) return;
+    if(!hasOperator()){ alert("Identifícate primero."); return; }
+
+    const color = opt.dataset.color;
+    const p     = pisoActivo;
+    const num   = habitacionSeleccionada.dataset.num;
+
+    // Aplica color en UI
+    habitacionSeleccionada.className=`habitacion ${color}`;
+    setEtiqueta(habitacionSeleccionada,color);
+
+    // Mantén resto de datos y persiste en cache local
+    const prev = safeReadAll()?.[p]?.[num] || {};
+    safeWrite(p, num, {
+      color,
+      nota:  prev.nota || "",
+      camas: prev.camas || [],
+      fecha: ahoraStr(),
+      por:   localStorage.getItem("staffName")
+    });
+
+    actualizarPanelEstado(); 
+    solicitarResumen();
+    menu.style.display="none";
+
+    // Actualiza KPIs/mini si estás en modo resumen
+    if(modoResumen){
+      pintarKpis(p);
+      actualizarMiniResumen(p);
+    }
+
+    // Sincroniza en Firestore
+    try { await window.syncRoom(num, { status: color }); }
+    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); console.warn(e); }
+  });
+});
+
+/* ================== Realtime Firestore → DOM (vista normal + mini) ================== */
+window.renderRooms = (rooms) => {
+  rooms.forEach(r => {
+    const idStr = String(r.id);
+    const status = r.status || "verde";
+    const nota   = r.note   || "";
+    const camas  = r.beds   || [];
+    const fecha  = (r.updatedAt && r.updatedAt.toDate) ? r.updatedAt.toDate().toLocaleString() : ahoraStr();
+    const por    = r.updatedBy || r.by || "";
+
+    // Deducción de piso por el primer dígito (201 → 2, 305 → 3, etc.)
+    const piso = Number(idStr[0]);
+    if(![2,3,4].includes(piso)) return;
+
+    // Cache local
+    safeWrite(piso, idStr, { color: status, nota, camas, fecha, por });
+
+    // Actualiza room en la vista "grande" (si existe en DOM)
+    const bigEl = document.querySelector(`.habitacion[data-num="${idStr}"]`);
+    if(bigEl){
+      bigEl.className = `habitacion ${status}`;
+      setEtiqueta(bigEl, status);
+      syncStar(bigEl, nota);
+    }
+
+    // Actualiza room en mini-mapa (si existe)
+    const miniEl = document.querySelector(`#miniMapa${piso} .habitacion[data-num="${idStr}"]`);
+    if(miniEl){
+      miniEl.className = `habitacion ${status}`;
+      setEtiqueta(miniEl, status);
+      syncStar(miniEl, nota);
+    }
+
+    // Refresca KPIs y paneles
+    if(modoResumen){
+      pintarKpis(piso);
+      // Si la habitación afectada está seleccionada en la mini, actualiza recuadro
+      const isSelectedMini = miniEl && miniEl.classList.contains("selected");
+      if(isSelectedMini) actualizarMiniResumen(piso);
+    } else {
+      if(habitacionSeleccionada && habitacionSeleccionada.dataset.num === idStr){
+        actualizarPanelNota(); actualizarPanelEstado(); solicitarResumen();
+      }
+    }
+  });
 };
 </script>
-
 </body>
 </html>
