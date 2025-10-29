@@ -165,7 +165,32 @@
 .mini .pasillo{ 
   gap: 26px;
 }
+    /* === FORCE 3 COLS (1366px laptops) — súper compacto === */
+@media (min-width:1200px) and (max-width:1440px){
+  .resumen-multi.active{
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 10px !important;
   }
+  .resumen-card{
+    max-width: 420px !important;
+    padding: 10px !important;
+  }
+  .mini-mapa{
+    max-width: 310px !important;
+    padding: 10px !important;
+    gap: 14px !important;
+  }
+  .mini .pasillo{ 
+    gap: 18px !important;   /* pasillo angosto */
+  }
+}
+
+/* Afinado extra (opcional) */
+@media (min-width:1200px) and (max-width:1440px){
+  .resumen-card h3{ font-size:16px !important; }
+  .resumen-card .kpis{ margin-bottom:6px !important; }
+}
+
 </style>
 </head>
 
