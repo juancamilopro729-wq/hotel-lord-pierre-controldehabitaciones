@@ -20,12 +20,10 @@
   *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;}
   body{background:#f9fafb;display:flex;height:100vh;overflow:hidden;}
 
-  /* Logo fijo */
   .logo-fijo{position:fixed;bottom:10px;right:10px;z-index:50;opacity:.6;transition:.3s}
   .logo-fijo:hover{opacity:1}
   .logo-fijo img{height:50px;width:auto;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.2));pointer-events:none;user-select:none}
 
-  /* Sidebar pisos */
   .sidebar{
     background:var(--gris-panel);
     width:220px; display:flex; flex-direction:column; align-items:center;
@@ -40,7 +38,6 @@
   .btn-piso:hover{filter:brightness(.95);}
   .btn-piso.active{background:#fff;color:var(--azul);border:2px solid var(--azul);}
 
-  /* Main */
   .main{flex:1; display:flex; flex-direction:column; align-items:center; padding:18px; overflow-y:auto; position:relative;}
   .piso{
     opacity:0; transform:translateX(100%); position:absolute; transition:.45s ease;
@@ -49,11 +46,9 @@
   .piso.active{opacity:1; transform:translateX(0); position:relative;}
   .titulo-piso{font-size:22px;margin:6px 0 16px;font-weight:800;}
 
-  /* Layout interno por piso */
   .contenedor{display:flex;flex-direction:column;align-items:center;gap:20px;}
   @media(min-width:900px){.contenedor{flex-direction:row;align-items:flex-start;gap:56px;}}
 
-  /* Mapa grande */
   .mapa{
     background:#4b5563; padding:22px; border-radius:14px;
     display:flex; justify-content:center; gap:28px; flex-wrap:wrap;
@@ -61,7 +56,6 @@
   .columna{display:flex;flex-direction:column;gap:10px;}
   .pasillo{display:flex;justify-content:space-between;width:100%;gap:80px;}
 
-  /* Habitación (tamaño normal) */
   .habitacion{
     width:70px;height:54px;border-radius:14px;color:#000;font-weight:800;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -74,7 +68,6 @@
   .estado-label{position:absolute;bottom:4px;font-size:11px;font-weight:700;color:#000;text-shadow:0 1px 2px #fff8;}
   .estrella-nota{position:absolute;top:6px;right:8px;color:var(--estrella);font-size:18px;line-height:1;}
 
-  /* Paneles laterales */
   .panel{display:flex;flex-direction:column;align-items:center;gap:16px;width:92%;max-width:360px;}
   .box{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:16px;width:100%;box-shadow:0 1px 4px rgba(0,0,0,.06);}
   .box h3{margin-bottom:10px;font-size:16px;}
@@ -92,7 +85,6 @@
   .resumen p{margin:6px 0;font-size:14px;line-height:1.4;}
   textarea{width:100%;height:110px;border:1px solid #ccc;border-radius:10px;resize:none;padding:10px;font-size:14px;background:#f9fafb;}
 
-  /* Tabla ERP */
   table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;}
   th, td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left;}
   th{background:#f3f4f6;font-weight:700;}
@@ -100,43 +92,38 @@
   select, input[type="number"], input[type="text"]{width:100%;padding:6px;border:1px solid #d1d5db;border-radius:8px;background:#fff;}
   .delete-btn{background:none;border:none;color:#ef4444;font-size:16px;cursor:pointer;}
 
-  /* Menú de colores */
   .menu-colores{
     display:none; position:fixed; background:#fff; border:1px solid #ccc; border-radius:8px;
     padding:6px; box-shadow:0 0 12px rgba(0,0,0,.2); z-index:1000;
   }
   .color-opcion{width:30px;height:30px;border-radius:6px;margin:6px;display:inline-block;cursor:pointer;border:1px solid #9994;}
 
-  /* Estado bloqueado */
   .blocked { opacity:.6; pointer-events:none; }
   .hint { font-size:12px; color:#6b7280; margin-top:6px; }
 
-  /* ======== RESUMEN (tres columnas, tamaño normal, compacto) ======== */
   .resumen-multi{ display:none; width:100%; }
   .resumen-multi.active{
     display:grid;
-    grid-template-columns:repeat(3, minmax(0, 1fr)); /* 3 tarjetas por fila */
+    grid-template-columns:repeat(3, minmax(0, 1fr));
     gap:20px; align-items:start;
   }
   .resumen-card{
     background:#fff;border:1px solid var(--borde);
     border-radius:14px;padding:14px;box-shadow:0 1px 4px rgba(0,0,0,.06);
-    width:100%; max-width:520px; margin:0 auto;     /* evita que se estire */
+    width:100%; max-width:520px; margin:0 auto;
   }
   .resumen-card h3{font-size:18px;margin-bottom:10px;}
   .resumen-card .kpis{ display:flex; gap:8px; overflow-x:auto; white-space:nowrap; margin-bottom:10px;}
 
-  /* Habitaciones tamaño normal dentro del mini-mapa */
   .mini .habitacion{ width:70px;height:54px;border-radius:14px;font-size:14px;}
   .mini .estado-label{font-size:11px;}
   .mini-mapa{
     background:#4b5563;padding:16px;border-radius:14px;
     display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:10px;
-    max-width:420px; margin-left:auto; margin-right:auto;  /* limita ancho del mapa */
+    max-width:420px; margin-left:auto; margin-right:auto;
   }
   .mini .pasillo{ gap:48px; }
 
-  /* Ajustes por tamaño de pantalla */
   @media(max-width:1500px){
     .resumen-multi.active{ grid-template-columns:repeat(2, minmax(0, 1fr)); }
     .resumen-card{ max-width:500px; }
@@ -151,7 +138,6 @@
     .resumen-multi.active{ grid-template-columns:1fr; }
   }
 
-  /* ===== Laptop 1366–1440px: forzar 3 columnas y pasillo angosto ===== */
   @media (min-width:1200px) and (max-width:1440px){
     .resumen-multi.active{
       grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
@@ -174,7 +160,6 @@
     .resumen-card .kpis{ gap:6px !important; margin-bottom:6px !important; }
   }
 
-  /* Compacto extremo (si aún no entran 3) */
   @media (min-width:1200px) and (max-width:1440px){
     .resumen-multi.active{ gap: 8px !important; }
     .resumen-card{ max-width: 380px !important; padding: 8px !important; }
@@ -187,10 +172,8 @@
 
 <body>
 
-<!-- Logo -->
 <div class="logo-fijo"><img src="logo-lordpierre.png" alt="Hotel Lord Pierre" /></div>
 
-<!-- Sidebar -->
 <div class="sidebar">
   <button class="btn-piso active" data-piso="2">🏨 Piso 2</button>
   <button class="btn-piso" data-piso="3">🏨 Piso 3</button>
@@ -198,95 +181,118 @@
   <button class="btn-piso" data-piso="resumen">📊 Resumen (2–4)</button>
 </div>
 
-<!-- Main -->
 <div class="main">
   <div id="piso2" class="piso active"></div>
   <div id="piso3" class="piso"></div>
   <div id="piso4" class="piso"></div>
-  <!-- Resumen -->
   <div id="resumenView" class="resumen-multi"></div>
 </div>
 
-<!-- Menú de colores -->
 <div class="menu-colores" id="menu">
   <div class="color-opcion" data-color="verde"   style="background:var(--verde)"   title="Vacío limpio (VL)"></div>
   <div class="color-opcion" data-color="naranja" style="background:var(--naranja)" title="Vacío sucio (VS)"></div>
   <div class="color-opcion" data-color="amarillo"style="background:var(--amarillo)"title="Ocupado (OC)"></div>
   <div class="color-opcion" data-color="rojo"    style="background:var(--rojo)"    title="Bloqueado (BL)"></div>
 </div>
-<!-- === Firebase + Realtime === -->
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-  import {
-    getFirestore, collection, doc, onSnapshot, setDoc,
-    serverTimestamp, addDoc
-  } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDg7vGSj6ipsY_kp-vfmWyv1QwXI74ZGIQ",
-    authDomain: "hotellordpierre-control.firebaseapp.com",
-    projectId: "hotellordpierre-control"
-  };
+<!-- =========================================================
+     CAMBIO CLAVE: "FIREBASE MANDA"
+     - Firestore alimenta un cache en memoria (roomCache)
+     - localStorage solo se usa como cache/offline
+========================================================= -->
 
-  const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
-
-  // Rutas collections
-  const HOTEL_ID = "lord-pierre";
-  const roomsCol = collection(db, "hotels", HOTEL_ID, "rooms");
-  const auditCol = collection(db, "hotels", HOTEL_ID, "audit");
-
-  // Utilidad: nombre de operador (obligatorio para escribir)
-  function getStaffName() {
-    const by = localStorage.getItem("staffName");
-    if (!by || by.trim().length < 2) throw new Error("OPERADOR_REQUERIDO");
-    return by.trim();
-  }
-
-  // Escritura con auditoría
-  window.syncRoom = async (roomId, data) => {
-    const by = getStaffName();
-    const payload = { ...data, updatedBy: by, updatedAt: serverTimestamp() };
-    await setDoc(doc(roomsCol, String(roomId)), payload, { merge: true });
-    await addDoc(auditCol, { roomId: String(roomId), by, at: serverTimestamp(), data });
-  };
-
-  // Atajo
-  window.setRoomStatus = async (roomId, status) => window.syncRoom(roomId, { status });
-
-  // Realtime → delega al renderer de la app
-  onSnapshot(roomsCol, (snap) => {
-    const rooms = []; snap.forEach((d) => rooms.push({ id: d.id, ...d.data() }));
-    if (window.renderRooms) window.renderRooms(rooms);
-  });
-</script>
-
-<!-- === LÓGICA DE INTERFAZ === -->
 <script>
 /* ================== Datos base ================== */
 const pisos={2:{inicio:200,fin:221},3:{inicio:300,fin:319},4:{inicio:400,fin:421}};
 const COLOR_MAP={verde:{label:'Vacío limpio',sigla:'VL'},naranja:{label:'Vacío sucio',sigla:'VS'},amarillo:{label:'Ocupado',sigla:'OC'},rojo:{label:'Bloqueado',sigla:'BL'}};
+
 let pisoActivo=2,habitacionSeleccionada=null,modoResumen=false;
 const menu=document.getElementById("menu");
 
+/* ================== Cache en memoria (FUENTE UI) ==================
+   - Aquí es donde la UI lee primero SIEMPRE.
+   - Se llena con Firestore (online).
+   - Si estás offline, se hidrata desde localStorage.
+*/
+let firestoreReady = false;
+const roomCache = {2:{},3:{},4:{}}; // { piso: { roomNum: {color, nota, camas, fecha, por} } }
+
+/* ================== LocalStorage: SOLO cache/offline ================== */
+function safeReadAll(){
+  try{ return JSON.parse(localStorage.getItem("datosHabitaciones")) || {2:{},3:{},4:{}}; }
+  catch{ return {2:{},3:{},4:{}}; }
+}
+function persistCacheToLocal(){
+  // Guardamos roomCache como respaldo offline
+  localStorage.setItem("datosHabitaciones", JSON.stringify(roomCache));
+}
+function hydrateCacheFromLocal(){
+  // Si NO hay Firestore (offline o primer arranque sin red), cargamos el cache
+  const local = safeReadAll();
+  [2,3,4].forEach(p => { roomCache[p] = local[p] || {}; });
+}
+hydrateCacheFromLocal();
+
+/* ================== Utilidades de cache ================== */
+function getRoomData(piso,num){
+  // "Firebase manda": si Firestore ya cargó, la UI debe usar roomCache sí o sí
+  // Si aún no cargó (o estás offline), roomCache ya trae respaldo desde localStorage
+  return (roomCache?.[piso]?.[num]) || {};
+}
+function upsertRoomData(piso,num,data,{persist=true}={}){
+  if(!roomCache[piso]) roomCache[piso] = {};
+  roomCache[piso][num] = { ...(roomCache[piso][num]||{}), ...data };
+  if(persist) persistCacheToLocal();
+}
+
 /* ================== Operador ================== */
 function hasOperator(){ const n=localStorage.getItem("staffName"); return !!(n&&n.trim().length>=2);}
-function setOperator(name){ const s=(name||"").trim(); if(s.length<2){alert("Escribe tu nombre (mínimo 2 caracteres).");return false;} localStorage.setItem("staffName",s); pintarOperadorEnResumen(); lockUI(false); return true; }
-function clearOperator(){ localStorage.removeItem("staffName"); pintarOperadorEnResumen(); lockUI(true); }
+function setOperator(name){
+  const s=(name||"").trim();
+  if(s.length<2){alert("Escribe tu nombre (mínimo 2 caracteres).");return false;}
+  localStorage.setItem("staffName",s);
+  pintarOperadorEnResumen();
+  lockUI(false);
+  return true;
+}
+function clearOperator(){
+  localStorage.removeItem("staffName");
+  pintarOperadorEnResumen();
+  lockUI(true);
+}
 function lockUI(block){
   const isBlocked=!!block;
-  document.querySelectorAll(".btn.primary, .btn.danger").forEach(b=>{const box=b.closest(".box"); if(box&&box.id&&box.id.startsWith("opbox")) return; b.disabled=isBlocked;});
+  document.querySelectorAll(".btn.primary, .btn.danger").forEach(b=>{
+    const box=b.closest(".box");
+    if(box&&box.id&&box.id.startsWith("opbox")) return;
+    b.disabled=isBlocked;
+  });
   if(isBlocked) menu.style.display="none";
-  document.querySelectorAll(".mapa, .panel .box").forEach(el=>{ if(el.id&&el.id.startsWith("opbox")) return; el.classList[isBlocked?"add":"remove"]("blocked");});
+  document.querySelectorAll(".mapa, .panel .box").forEach(el=>{
+    if(el.id&&el.id.startsWith("opbox")) return;
+    el.classList[isBlocked?"add":"remove"]("blocked");
+  });
 }
-function pintarOperadorEnResumen(){const name=localStorage.getItem("staffName"); document.querySelectorAll("[data-operator-chip]").forEach(el=>{el.textContent=name?`Operador: ${name}`:"Operador: —";});}
+function pintarOperadorEnResumen(){
+  const name=localStorage.getItem("staffName");
+  document.querySelectorAll("[data-operator-chip]").forEach(el=>{
+    el.textContent=name?`Operador: ${name}`:"Operador: —";
+  });
+}
 
-/* ================== Utilidades ================== */
-function safeReadAll(){ try{ return JSON.parse(localStorage.getItem("datosHabitaciones")) || {2:{},3:{},4:{}}; }catch{ return {2:{},3:{},4:{}}; } }
-function safeWrite(piso,num,data){ const all=safeReadAll(); if(!all[piso]) all[piso]={}; all[piso][num]={...(all[piso][num]||{}),...data}; localStorage.setItem("datosHabitaciones",JSON.stringify(all)); }
+/* ================== Utilidades UI ================== */
 function obtenerColor(h){ return [...h.classList].find(c=>Object.keys(COLOR_MAP).includes(c))||"verde"; }
 function setEtiqueta(h,color){ const e=h.querySelector(".estado-label"); if(e) e.textContent=COLOR_MAP[color].sigla; }
-function syncStar(h,nota){ const prev=h.querySelector(".estrella-nota"); if(prev) prev.remove(); if(nota && nota.trim()){ const s=document.createElement("span"); s.className="estrella-nota"; s.textContent="★"; h.appendChild(s);} }
+function syncStar(h,nota){
+  const prev=h.querySelector(".estrella-nota");
+  if(prev) prev.remove();
+  if(nota && nota.trim()){
+    const s=document.createElement("span");
+    s.className="estrella-nota";
+    s.textContent="★";
+    h.appendChild(s);
+  }
+}
 const ahoraStr = ()=> new Date().toLocaleString();
 
 /* ================== Construcción de UI ================== */
@@ -367,19 +373,29 @@ function crearHabitaciones(piso){
   const mapa=document.getElementById(`mapa${piso}`); mapa.innerHTML="";
   const colP=document.createElement("div"), colI=document.createElement("div");
   colP.className="columna"; colI.className="columna";
+
   for(let n=pisos[piso].inicio;n<=pisos[piso].fin;n++){
     const h=document.createElement("div");
-    h.className="habitacion verde"; h.dataset.num=n;
+    h.className="habitacion verde";
+    h.dataset.num=n;
     h.innerHTML=`<div>${n}</div><span class="estado-label">VL</span>`;
-    const saved=safeReadAll()?.[piso]?.[n];
+
+    // Pintado desde cache en memoria (que Firestore actualiza)
+    // Si aún no llega Firestore y estás offline, cache viene de localStorage
+    const saved = getRoomData(piso, String(n));
     if(saved){
       if(saved.color){ h.className=`habitacion ${saved.color}`; setEtiqueta(h,saved.color); }
       if(saved.nota){ syncStar(h,saved.nota); }
     }
+
     h.onclick=e=>{ e.stopPropagation(); seleccionarHabitacion(h,piso); if(window.abrirMenu) abrirMenu(e); };
     (n%2===0?colP:colI).appendChild(h);
   }
-  const wrap=document.createElement("div"); wrap.className="pasillo"; wrap.append(colP,colI); mapa.appendChild(wrap);
+
+  const wrap=document.createElement("div");
+  wrap.className="pasillo";
+  wrap.append(colP,colI);
+  mapa.appendChild(wrap);
 }
 
 /* ================== Interacción (paneles) ================== */
@@ -392,13 +408,15 @@ function seleccionarHabitacion(h,piso){
 
 function actualizarPanelNota(){
   const p=pisoActivo; if(!habitacionSeleccionada) return;
-  const num=habitacionSeleccionada.dataset.num;
+  const num=String(habitacionSeleccionada.dataset.num);
+
   const box=document.getElementById(`notaTexto${p}`);
   const titulo=document.getElementById(`notaTitulo${p}`);
   const btnG=document.getElementById(`btnGuardar${p}`);
   const btnE=document.getElementById(`btnEliminar${p}`);
   const badge=document.getElementById(`badge${p}`);
-  const saved=safeReadAll()?.[p]?.[num]||{};
+
+  const saved=getRoomData(p, num) || {};
 
   box.disabled=false; btnG.disabled=false; btnE.disabled=false;
   box.value=saved.nota||"";
@@ -409,20 +427,27 @@ function actualizarPanelNota(){
   btnG.onclick=async ()=>{
     if(!hasOperator()){ alert("Identifícate primero."); return; }
     const nota = box.value.trim();
-    safeWrite(p,num,{nota,fecha:ahoraStr(),por:localStorage.getItem("staffName")});
+
+    // Actualiza cache en memoria + local (optimista)
+    upsertRoomData(p, num, { nota, fecha:ahoraStr(), por:localStorage.getItem("staffName") }, {persist:true});
     syncStar(habitacionSeleccionada,nota);
     setBadge("✅ Guardado");
     solicitarResumen();
-    try { await window.syncRoom(num, { note: nota }); } 
+
+    // Sincroniza Firestore
+    try { await window.syncRoom(num, { note: nota }); }
     catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); }
   };
+
   btnE.onclick=async ()=>{
     if(!hasOperator()){ alert("Identifícate primero."); return; }
-    safeWrite(p, num, { nota: "", fecha: ahoraStr(), por: localStorage.getItem("staffName") });
+
+    upsertRoomData(p, num, { nota:"", fecha:ahoraStr(), por:localStorage.getItem("staffName") }, {persist:true});
     box.value=""; syncStar(habitacionSeleccionada,"");
     setBadge("🗑️ Eliminado");
     solicitarResumen();
-    try { await window.syncRoom(num, { note: "" }); } 
+
+    try { await window.syncRoom(num, { note: "" }); }
     catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); }
   };
 }
@@ -447,14 +472,20 @@ function actualizarPanelCamas(){
   const btnAdd=document.getElementById(`agregarCama${p}`);
 
   if(!habitacionSeleccionada){
-    if(tabla) tabla.innerHTML=""; [btnG,btnE,btnAdd].forEach(b=>b && (b.disabled=true)); return;
+    if(tabla) tabla.innerHTML="";
+    [btnG,btnE,btnAdd].forEach(b=>b && (b.disabled=true));
+    return;
   }
   [btnG,btnE,btnAdd].forEach(b=>b && (b.disabled=false));
 
-  const num=habitacionSeleccionada.dataset.num;
-  const saved=safeReadAll()?.[p]?.[num]||{};
+  const num=String(habitacionSeleccionada.dataset.num);
+  const saved=getRoomData(p, num) || {};
   const camas=saved.camas||[];
-  if(tabla){ tabla.innerHTML=""; camas.forEach(c=>agregarFilaCama(p,c.cantidad,c.tipo)); }
+
+  if(tabla){
+    tabla.innerHTML="";
+    camas.forEach(c=>agregarFilaCama(p,c.cantidad,c.tipo));
+  }
 
   const setBadge=m=>{ if(badge){ badge.textContent=m; setTimeout(()=>badge.textContent="",1200); } };
 
@@ -462,16 +493,26 @@ function actualizarPanelCamas(){
 
   if(btnG) btnG.onclick=async ()=>{
     if(!hasOperator()){ alert("Identifícate primero."); return; }
-    const filas=[...tabla.querySelectorAll("tr")].map(tr=>({cantidad:tr.querySelector("input").value,tipo:tr.querySelector("select").value})).filter(x=>x.cantidad && x.tipo);
-    safeWrite(p,num,{camas:filas,fecha:ahoraStr(),por:localStorage.getItem("staffName")});
+    const filas=[...tabla.querySelectorAll("tr")]
+      .map(tr=>({cantidad:tr.querySelector("input").value,tipo:tr.querySelector("select").value}))
+      .filter(x=>x.cantidad && x.tipo);
+
+    upsertRoomData(p, num, { camas:filas, fecha:ahoraStr(), por:localStorage.getItem("staffName") }, {persist:true});
     setBadge("✅ Guardado"); solicitarResumen();
-    try { await window.syncRoom(num, { beds: filas }); } catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); }
+
+    try { await window.syncRoom(num, { beds: filas }); }
+    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); }
   };
+
   if(btnE) btnE.onclick=async ()=>{
     if(!hasOperator()){ alert("Identifícate primero."); return; }
-    safeWrite(p,num,{camas:[],fecha:ahoraStr(),por:localStorage.getItem("staffName")});
-    if(tabla) tabla.innerHTML=""; setBadge("🗑️ Eliminado"); solicitarResumen();
-    try { await window.syncRoom(num, { beds: [] }); } catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); }
+
+    upsertRoomData(p, num, { camas:[], fecha:ahoraStr(), por:localStorage.getItem("staffName") }, {persist:true});
+    if(tabla) tabla.innerHTML="";
+    setBadge("🗑️ Eliminado"); solicitarResumen();
+
+    try { await window.syncRoom(num, { beds: [] }); }
+    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); }
   };
 }
 
@@ -498,10 +539,11 @@ function agregarFilaCama(p,cantidad="",tipo=""){
 
 /* ====== KPIs + mini mapas (Resumen) ====== */
 function contarPorColor(piso){
-  const all = safeReadAll()?.[piso] || {};
   const counts = {verde:0,naranja:0,amarillo:0,rojo:0};
   for(let n=pisos[piso].inicio;n<=pisos[piso].fin;n++){
-    const c = (all[n]?.color) || "verde"; counts[c] = (counts[c]||0)+1;
+    const saved = getRoomData(piso, String(n));
+    const c = (saved?.color) || "verde";
+    counts[c] = (counts[c]||0)+1;
   }
   return counts;
 }
@@ -514,42 +556,59 @@ function pintarKpis(piso){
     ).join('')}
     <span class="chip">Total: <b>${Object.values(c).reduce((a,b)=>a+b,0)}</b></span>`;
 }
+
 function crearMiniHabitaciones(piso){
   const mapa = document.getElementById(`miniMapa${piso}`); if(!mapa) return;
   mapa.innerHTML = "";
   const colP = document.createElement("div"), colI = document.createElement("div");
   colP.className="columna"; colI.className="columna";
+
   for(let n=pisos[piso].inicio;n<=pisos[piso].fin;n++){
     const h=document.createElement("div");
     h.className="habitacion verde"; h.dataset.num=n;
     h.innerHTML=`<div>${n}</div><span class="estado-label">VL</span>`;
-    const saved=safeReadAll()?.[piso]?.[n];
-    if(saved){ if(saved.color){ h.className=`habitacion ${saved.color}`; setEtiqueta(h,saved.color);} if(saved.nota){ syncStar(h,saved.nota);} }
+
+    const saved = getRoomData(piso, String(n));
+    if(saved){
+      if(saved.color){ h.className=`habitacion ${saved.color}`; setEtiqueta(h,saved.color); }
+      if(saved.nota){ syncStar(h,saved.nota); }
+    }
+
     h.onclick=(e)=>{ e.stopPropagation(); seleccionarMini(h,piso); if(window.abrirMenu) abrirMenu(e); };
     (n%2===0?colP:colI).appendChild(h);
   }
   const wrap=document.createElement("div"); wrap.className="pasillo"; wrap.append(colP,colI); mapa.appendChild(wrap);
 }
+
 function seleccionarMini(h,piso){
   document.querySelectorAll(`#miniMapa${piso} .habitacion.selected`).forEach(x=>x.classList.remove("selected"));
   habitacionSeleccionada=h; pisoActivo=piso; h.classList.add("selected");
   actualizarMiniResumen(piso);
 }
+
 function actualizarMiniResumen(piso){
   const num = habitacionSeleccionada?.dataset?.num;
   const resumen = document.getElementById(`miniResumen${piso}`);
   const estadoT = document.getElementById(`miniEstado${piso}`);
   const swatch  = document.getElementById(`miniSwatch${piso}`);
-  if(!num){ if(resumen) resumen.innerHTML="<p>Selecciona una habitación…</p>"; if(estadoT) estadoT.textContent="Selecciona una habitación…"; return; }
-  const saved = safeReadAll()?.[piso]?.[num] || {};
+  if(!num){
+    if(resumen) resumen.innerHTML="<p>Selecciona una habitación…</p>";
+    if(estadoT) estadoT.textContent="Selecciona una habitación…";
+    return;
+  }
+
+  const saved = getRoomData(piso, String(num)) || {};
   const color = obtenerColor(habitacionSeleccionada);
   const meta  = COLOR_MAP[color];
+
   if(estadoT) estadoT.textContent = `Habitación ${num} — ${meta.label}.`;
   if(swatch)  swatch.style.background = getComputedStyle(document.documentElement).getPropertyValue(`--${color}`);
+
   const camasTxt = (saved.camas && saved.camas.length) ? saved.camas.map(c=>`${c.cantidad} ${c.tipo}`).join(", ") : "Sin registrar";
   const notaTxt  = saved.nota || "—";
   const fechaTxt = saved.fecha || "Sin registrar";
   const porTxt   = saved.por || "—";
+
   if(resumen){
     resumen.innerHTML = `
       <p><strong>Camas:</strong> ${camasTxt}</p>
@@ -557,6 +616,7 @@ function actualizarMiniResumen(piso){
       <p><strong>Últ. mod.:</strong> ${fechaTxt} <em>por</em> ${porTxt}</p>`;
   }
 }
+
 function renderResumenGlobal(){
   const wrap = document.getElementById("resumenView"); if(!wrap) return;
   wrap.innerHTML = "";
@@ -583,21 +643,29 @@ function renderResumenGlobal(){
 /* ====== Resumen (throttle + reloj) ====== */
 let needsResumen=true;
 function solicitarResumen(){ needsResumen=true; }
+
 function actualizarResumen(){
   const p=pisoActivo;
   const resumen=document.getElementById(`resumenContenido${p}`);
   const reloj=document.getElementById(`reloj${p}`);
   if(reloj) reloj.textContent=new Date().toLocaleTimeString();
-  if(!habitacionSeleccionada){ if(resumen) resumen.innerHTML="<p>Selecciona una habitación...</p>"; return; }
-  const num=habitacionSeleccionada.dataset.num;
-  const saved=safeReadAll()?.[p]?.[num]||{};
+
+  if(!habitacionSeleccionada){
+    if(resumen) resumen.innerHTML="<p>Selecciona una habitación...</p>";
+    return;
+  }
+
+  const num=String(habitacionSeleccionada.dataset.num);
+  const saved=getRoomData(p, num) || {};
   const color=obtenerColor(habitacionSeleccionada);
   const meta=COLOR_MAP[color];
+
   const camasTxt=(saved.camas&&saved.camas.length)? saved.camas.map(c=>`${c.cantidad} ${c.tipo}`).join(", "):"Sin registrar";
   const notaTxt=saved.nota||"—";
   const fechaTxt=saved.fecha||"Sin registrar";
   const operadorActivo = localStorage.getItem("staffName") || "—";
-  const modifico = saved.por || "—"; 
+  const modifico = saved.por || "—";
+
   if(resumen) resumen.innerHTML=`
     <p><strong>Operador activo:</strong> ${operadorActivo}</p>
     <p><strong>Habitación:</strong> ${num}</p>
@@ -607,7 +675,13 @@ function actualizarResumen(){
     <p><strong>Última modificación:</strong> ${fechaTxt}</p>
     <p><strong>Última modificación por:</strong> ${modifico}</p>`;
 }
-setInterval(()=>{ if(needsResumen){ actualizarResumen(); needsResumen=false; } const p=pisoActivo; const reloj=document.getElementById(`reloj${p}`); if(reloj) reloj.textContent=new Date().toLocaleTimeString(); },1000);
+
+setInterval(()=>{
+  if(needsResumen){ actualizarResumen(); needsResumen=false; }
+  const p=pisoActivo;
+  const reloj=document.getElementById(`reloj${p}`);
+  if(reloj) reloj.textContent=new Date().toLocaleTimeString();
+},1000);
 
 /* ====== Bootstrap mínimo ====== */
 [2,3,4].forEach(crearPiso);
@@ -623,11 +697,9 @@ document.querySelectorAll(".btn-piso").forEach(btn=>{
     btn.classList.add("active");
     const key = btn.dataset.piso;
 
-    // Cierra menú de colores si estuviera abierto
     menu.style.display="none";
 
     if(key === "resumen"){
-      // Tablero con 3 tarjetas y mini-mapas
       window.modoResumen = true;
       document.querySelectorAll(".piso").forEach(p=>p.classList.remove("active"));
       document.getElementById("resumenView").classList.add("active");
@@ -635,7 +707,6 @@ document.querySelectorAll(".btn-piso").forEach(btn=>{
       renderResumenGlobal();
       lockUI(!hasOperator());
     } else {
-      // Vista por piso
       window.modoResumen = false;
       document.getElementById("resumenView").classList.remove("active");
 
@@ -645,9 +716,9 @@ document.querySelectorAll(".btn-piso").forEach(btn=>{
 
       window.pisoActivo = piso;
       window.habitacionSeleccionada = null;
-      actualizarPanelNota(); 
-      actualizarPanelEstado(); 
-      actualizarPanelCamas(); 
+      actualizarPanelNota();
+      actualizarPanelEstado();
+      actualizarPanelCamas();
       solicitarResumen();
     }
   });
@@ -675,40 +746,91 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
 
     const color = opt.dataset.color;
     const p     = pisoActivo;
-    const num   = habitacionSeleccionada.dataset.num;
+    const num   = String(habitacionSeleccionada.dataset.num);
 
-    // Aplica color en UI (big o mini)
+    // UI inmediata (optimista)
     habitacionSeleccionada.className=`habitacion ${color}`;
     setEtiqueta(habitacionSeleccionada,color);
 
-    // Cache local manteniendo datos existentes
-    const prev = safeReadAll()?.[p]?.[num] || {};
-    safeWrite(p, num, {
+    // Cache en memoria + local (optimista)
+    const prev = getRoomData(p, num) || {};
+    upsertRoomData(p, num, {
       color,
       nota:  prev.nota || "",
       camas: prev.camas || [],
       fecha: ahoraStr(),
       por:   localStorage.getItem("staffName")
-    });
+    }, {persist:true});
 
-    // Refresca paneles
-    actualizarPanelEstado(); 
+    actualizarPanelEstado();
     solicitarResumen();
     menu.style.display="none";
 
-    // Si estás en Resumen: KPIs y recuadro
     if(modoResumen){
       pintarKpis(p);
       actualizarMiniResumen(p);
     }
 
-    // Sincroniza Firestore
+    // Firestore manda oficialmente (se reflejará de nuevo por realtime)
     try { await window.syncRoom(num, { status: color }); }
-    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); console.warn(e); }
+    catch(e){
+      if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior.");
+      console.warn(e);
+    }
   });
 });
+</script>
 
-/* ================== Realtime Firestore → DOM (vista normal + mini) ================== */
+<!-- === Firebase + Realtime === -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import {
+    getFirestore, collection, doc, onSnapshot, setDoc,
+    serverTimestamp, addDoc
+  } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDg7vGSj6ipsY_kp-vfmWyv1QwXI74ZGIQ",
+    authDomain: "hotellordpierre-control.firebaseapp.com",
+    projectId: "hotellordpierre-control"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+
+  const HOTEL_ID = "lord-pierre";
+  const roomsCol = collection(db, "hotels", HOTEL_ID, "rooms");
+  const auditCol = collection(db, "hotels", HOTEL_ID, "audit");
+
+  function getStaffName() {
+    const by = localStorage.getItem("staffName");
+    if (!by || by.trim().length < 2) throw new Error("OPERADOR_REQUERIDO");
+    return by.trim();
+  }
+
+  window.syncRoom = async (roomId, data) => {
+    const by = getStaffName();
+    const payload = { ...data, updatedBy: by, updatedAt: serverTimestamp() };
+    await setDoc(doc(roomsCol, String(roomId)), payload, { merge: true });
+    await addDoc(auditCol, { roomId: String(roomId), by, at: serverTimestamp(), data });
+  };
+
+  window.setRoomStatus = async (roomId, status) => window.syncRoom(roomId, { status });
+
+  // Realtime → Firestore MANDA → actualiza cache en memoria + DOM
+  onSnapshot(roomsCol, (snap) => {
+    // En cuanto llega el primer snapshot, ya consideramos a Firestore como “ready”
+    window.firestoreReady = true;
+
+    const rooms = [];
+    snap.forEach((d) => rooms.push({ id: d.id, ...d.data() }));
+
+    if (window.renderRooms) window.renderRooms(rooms);
+  });
+</script>
+
+<script>
+/* ================== Realtime Firestore → Cache + DOM ================== */
 window.renderRooms = (rooms) => {
   rooms.forEach(r => {
     const idStr = String(r.id);
@@ -718,14 +840,13 @@ window.renderRooms = (rooms) => {
     const fecha  = (r.updatedAt && r.updatedAt.toDate) ? r.updatedAt.toDate().toLocaleString() : ahoraStr();
     const por    = r.updatedBy || r.by || "";
 
-    // Deducción de piso por el primer dígito (201 → 2, 305 → 3, etc.)
     const piso = Number(idStr[0]);
     if(![2,3,4].includes(piso)) return;
 
-    // Cache local
-    safeWrite(piso, idStr, { color: status, nota, camas, fecha, por });
+    // Firestore manda: metemos en cache en memoria + persistimos como respaldo offline
+    upsertRoomData(piso, idStr, { color: status, nota, camas, fecha, por }, {persist:true});
 
-    // Actualiza habitación en vista grande (si existe en DOM)
+    // Actualiza habitación en DOM (grande)
     const bigEl = document.querySelector(`.piso.active .habitacion[data-num="${idStr}"]`)
                || document.querySelector(`.habitacion[data-num="${idStr}"]`);
     if(bigEl){
@@ -734,7 +855,7 @@ window.renderRooms = (rooms) => {
       syncStar(bigEl, nota);
     }
 
-    // Actualiza habitación en mini-mapa (si existe)
+    // Mini-mapa
     const miniEl = document.querySelector(`#miniMapa${piso} .habitacion[data-num="${idStr}"]`);
     if(miniEl){
       miniEl.className = `habitacion ${status}`;
@@ -743,12 +864,14 @@ window.renderRooms = (rooms) => {
     }
 
     // Refresca KPIs/paneles
-    if(modoResumen){
+    if(window.modoResumen){
       pintarKpis(piso);
       if(miniEl && miniEl.classList.contains("selected")) actualizarMiniResumen(piso);
     } else {
-      if(habitacionSeleccionada && habitacionSeleccionada.dataset.num === idStr){
-        actualizarPanelNota(); actualizarPanelEstado(); solicitarResumen();
+      if(habitacionSeleccionada && String(habitacionSeleccionada.dataset.num) === idStr){
+        actualizarPanelNota();
+        actualizarPanelEstado();
+        solicitarResumen();
       }
     }
   });
