@@ -20,10 +20,12 @@
   *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;}
   body{background:#f9fafb;display:flex;height:100vh;overflow:hidden;}
 
+  /* Logo fijo */
   .logo-fijo{position:fixed;bottom:10px;right:10px;z-index:50;opacity:.6;transition:.3s}
   .logo-fijo:hover{opacity:1}
   .logo-fijo img{height:50px;width:auto;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.2));pointer-events:none;user-select:none}
 
+  /* Sidebar */
   .sidebar{
     background:var(--gris-panel);
     width:220px; display:flex; flex-direction:column; align-items:center;
@@ -38,6 +40,7 @@
   .btn-piso:hover{filter:brightness(.95);}
   .btn-piso.active{background:#fff;color:var(--azul);border:2px solid var(--azul);}
 
+  /* Main */
   .main{flex:1; display:flex; flex-direction:column; align-items:center; padding:18px; overflow-y:auto; position:relative;}
   .piso{
     opacity:0; transform:translateX(100%); position:absolute; transition:.45s ease;
@@ -46,9 +49,11 @@
   .piso.active{opacity:1; transform:translateX(0); position:relative;}
   .titulo-piso{font-size:22px;margin:6px 0 16px;font-weight:800;}
 
+  /* Layout interno por piso */
   .contenedor{display:flex;flex-direction:column;align-items:center;gap:20px;}
   @media(min-width:900px){.contenedor{flex-direction:row;align-items:flex-start;gap:56px;}}
 
+  /* Mapa grande */
   .mapa{
     background:#4b5563; padding:22px; border-radius:14px;
     display:flex; justify-content:center; gap:28px; flex-wrap:wrap;
@@ -56,6 +61,7 @@
   .columna{display:flex;flex-direction:column;gap:10px;}
   .pasillo{display:flex;justify-content:space-between;width:100%;gap:80px;}
 
+  /* Habitación */
   .habitacion{
     width:70px;height:54px;border-radius:14px;color:#000;font-weight:800;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -68,12 +74,13 @@
   .estado-label{position:absolute;bottom:4px;font-size:11px;font-weight:700;color:#000;text-shadow:0 1px 2px #fff8;}
   .estrella-nota{position:absolute;top:6px;right:8px;color:var(--estrella);font-size:18px;line-height:1;}
 
+  /* Paneles laterales */
   .panel{display:flex;flex-direction:column;align-items:center;gap:16px;width:92%;max-width:360px;}
   .box{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:16px;width:100%;box-shadow:0 1px 4px rgba(0,0,0,.06);}
   .box h3{margin-bottom:10px;font-size:16px;}
   .leyenda-item{display:flex;align-items:center;margin:6px 0;font-size:14px;}
   .leyenda-color{width:18px;height:18px;border-radius:4px;margin-right:10px;border:1px solid #9994;}
-  .actions{display:flex;gap:10px;margin-top:10px;align-items:center;}
+  .actions{display:flex;gap:10px;margin-top:10px;align-items:center;flex-wrap:wrap;}
   .btn{padding:8px 12px;border-radius:8px;border:1px solid var(--borde);background:#f9fafb;cursor:pointer;font-weight:700;transition:.2s;}
   .btn:hover{background:#f3f4f6;}
   .btn.primary{background:#e0ecff;border-color:#bfdbfe;}
@@ -85,22 +92,26 @@
   .resumen p{margin:6px 0;font-size:14px;line-height:1.4;}
   textarea{width:100%;height:110px;border:1px solid #ccc;border-radius:10px;resize:none;padding:10px;font-size:14px;background:#f9fafb;}
 
+  /* Tabla ERP + tabla informes */
   table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;}
   th, td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left;}
   th{background:#f3f4f6;font-weight:700;}
   tr:hover td{background:#f9fafb;}
-  select, input[type="number"], input[type="text"]{width:100%;padding:6px;border:1px solid #d1d5db;border-radius:8px;background:#fff;}
+  select, input[type="number"], input[type="text"], input[type="date"]{width:100%;padding:6px;border:1px solid #d1d5db;border-radius:8px;background:#fff;}
   .delete-btn{background:none;border:none;color:#ef4444;font-size:16px;cursor:pointer;}
 
+  /* Menú de colores */
   .menu-colores{
     display:none; position:fixed; background:#fff; border:1px solid #ccc; border-radius:8px;
     padding:6px; box-shadow:0 0 12px rgba(0,0,0,.2); z-index:1000;
   }
   .color-opcion{width:30px;height:30px;border-radius:6px;margin:6px;display:inline-block;cursor:pointer;border:1px solid #9994;}
 
+  /* Estado bloqueado */
   .blocked { opacity:.6; pointer-events:none; }
   .hint { font-size:12px; color:#6b7280; margin-top:6px; }
 
+  /* ======== RESUMEN (tres columnas) ======== */
   .resumen-multi{ display:none; width:100%; }
   .resumen-multi.active{
     display:grid;
@@ -138,56 +149,46 @@
     .resumen-multi.active{ grid-template-columns:1fr; }
   }
 
+  /* Laptop 1366–1440px */
   @media (min-width:1200px) and (max-width:1440px){
-    .resumen-multi.active{
-      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-      gap: 10px !important;
-      padding: 0 !important;
-    }
-    .resumen-card{
-      max-width: 420px !important;
-      padding: 10px !important;
-      margin: 0 !important;
-      box-shadow: 0 1px 3px rgba(0,0,0,.05) !important;
-    }
-    .mini-mapa{
-      max-width: 310px !important;
-      padding: 10px !important;
-      gap: 14px !important;
-    }
-    .mini .pasillo{ gap: 18px !important; }
-    .resumen-card h3{ font-size:16px !important; margin-bottom:6px !important; }
-    .resumen-card .kpis{ gap:6px !important; margin-bottom:6px !important; }
-  }
-
-  @media (min-width:1200px) and (max-width:1440px){
-    .resumen-multi.active{ gap: 8px !important; }
-    .resumen-card{ max-width: 380px !important; padding: 8px !important; }
+    .resumen-multi.active{ grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 8px !important; padding: 0 !important; }
+    .resumen-card{ max-width: 380px !important; padding: 8px !important; margin: 0 !important; box-shadow:0 1px 3px rgba(0,0,0,.05) !important;}
     .mini-mapa{ max-width: 280px !important; padding: 8px !important; gap: 12px !important; }
     .mini .pasillo{ gap: 14px !important; }
     .mini .habitacion{ width:70px !important; height:54px !important; }
+    .resumen-card h3{ font-size:16px !important; margin-bottom:6px !important; }
   }
 </style>
 </head>
 
 <body>
 
+<!-- Logo -->
 <div class="logo-fijo"><img src="logo-lordpierre.png" alt="Hotel Lord Pierre" /></div>
 
+<!-- Sidebar -->
 <div class="sidebar">
   <button class="btn-piso active" data-piso="2">🏨 Piso 2</button>
   <button class="btn-piso" data-piso="3">🏨 Piso 3</button>
   <button class="btn-piso" data-piso="4">🏨 Piso 4</button>
   <button class="btn-piso" data-piso="resumen">📊 Resumen (2–4)</button>
+  <button class="btn-piso" data-piso="informes">📁 INFORMES</button>
 </div>
 
+<!-- Main -->
 <div class="main">
   <div id="piso2" class="piso active"></div>
   <div id="piso3" class="piso"></div>
   <div id="piso4" class="piso"></div>
+
+  <!-- Resumen -->
   <div id="resumenView" class="resumen-multi"></div>
+
+  <!-- Informes (solo lectura) -->
+  <div id="informesView" class="piso"></div>
 </div>
 
+<!-- Menú de colores -->
 <div class="menu-colores" id="menu">
   <div class="color-opcion" data-color="verde"   style="background:var(--verde)"   title="Vacío limpio (VL)"></div>
   <div class="color-opcion" data-color="naranja" style="background:var(--naranja)" title="Vacío sucio (VS)"></div>
@@ -195,50 +196,39 @@
   <div class="color-opcion" data-color="rojo"    style="background:var(--rojo)"    title="Bloqueado (BL)"></div>
 </div>
 
-<!-- =========================================================
-     CAMBIO CLAVE: "FIREBASE MANDA"
-     - Firestore alimenta un cache en memoria (roomCache)
-     - localStorage solo se usa como cache/offline
-========================================================= -->
+<!-- Librerías PDF (simple y funcional) -->
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.3/dist/jspdf.plugin.autotable.min.js"></script>
 
 <script>
 /* ================== Datos base ================== */
 const pisos={2:{inicio:200,fin:221},3:{inicio:300,fin:319},4:{inicio:400,fin:421}};
-const COLOR_MAP={verde:{label:'Vacío limpio',sigla:'VL'},naranja:{label:'Vacío sucio',sigla:'VS'},amarillo:{label:'Ocupado',sigla:'OC'},rojo:{label:'Bloqueado',sigla:'BL'}};
+const COLOR_MAP={
+  verde:{label:'Vacío limpio',sigla:'VL'},
+  naranja:{label:'Vacío sucio',sigla:'VS'},
+  amarillo:{label:'Ocupado',sigla:'OC'},
+  rojo:{label:'Bloqueado',sigla:'BL'}
+};
 
 let pisoActivo=2,habitacionSeleccionada=null,modoResumen=false;
 const menu=document.getElementById("menu");
 
-/* ================== Cache en memoria (FUENTE UI) ==================
-   - Aquí es donde la UI lee primero SIEMPRE.
-   - Se llena con Firestore (online).
-   - Si estás offline, se hidrata desde localStorage.
-*/
-let firestoreReady = false;
-const roomCache = {2:{},3:{},4:{}}; // { piso: { roomNum: {color, nota, camas, fecha, por} } }
+/* ================== Cache en memoria (UI lee aquí) ================== */
+const roomCache = {2:{},3:{},4:{}};
 
-/* ================== LocalStorage: SOLO cache/offline ================== */
+/* ================== LocalStorage: solo cache/offline ================== */
 function safeReadAll(){
   try{ return JSON.parse(localStorage.getItem("datosHabitaciones")) || {2:{},3:{},4:{}}; }
   catch{ return {2:{},3:{},4:{}}; }
 }
-function persistCacheToLocal(){
-  // Guardamos roomCache como respaldo offline
-  localStorage.setItem("datosHabitaciones", JSON.stringify(roomCache));
-}
+function persistCacheToLocal(){ localStorage.setItem("datosHabitaciones", JSON.stringify(roomCache)); }
 function hydrateCacheFromLocal(){
-  // Si NO hay Firestore (offline o primer arranque sin red), cargamos el cache
   const local = safeReadAll();
   [2,3,4].forEach(p => { roomCache[p] = local[p] || {}; });
 }
 hydrateCacheFromLocal();
 
-/* ================== Utilidades de cache ================== */
-function getRoomData(piso,num){
-  // "Firebase manda": si Firestore ya cargó, la UI debe usar roomCache sí o sí
-  // Si aún no cargó (o estás offline), roomCache ya trae respaldo desde localStorage
-  return (roomCache?.[piso]?.[num]) || {};
-}
+function getRoomData(piso,num){ return (roomCache?.[piso]?.[num]) || {}; }
 function upsertRoomData(piso,num,data,{persist=true}={}){
   if(!roomCache[piso]) roomCache[piso] = {};
   roomCache[piso][num] = { ...(roomCache[piso][num]||{}), ...data };
@@ -246,7 +236,7 @@ function upsertRoomData(piso,num,data,{persist=true}={}){
 }
 
 /* ================== Operador ================== */
-function hasOperator(){ const n=localStorage.getItem("staffName"); return !!(n&&n.trim().length>=2);}
+function hasOperator(){ const n=localStorage.getItem("staffName"); return !!(n&&n.trim().length>=2); }
 function setOperator(name){
   const s=(name||"").trim();
   if(s.length<2){alert("Escribe tu nombre (mínimo 2 caracteres).");return false;}
@@ -295,7 +285,7 @@ function syncStar(h,nota){
 }
 const ahoraStr = ()=> new Date().toLocaleString();
 
-/* ================== Construcción de UI ================== */
+/* ================== Construcción de UI por piso ================== */
 function crearPiso(piso){
   const cont=document.getElementById(`piso${piso}`);
   cont.innerHTML=`
@@ -376,26 +366,19 @@ function crearHabitaciones(piso){
 
   for(let n=pisos[piso].inicio;n<=pisos[piso].fin;n++){
     const h=document.createElement("div");
-    h.className="habitacion verde";
-    h.dataset.num=n;
+    h.className="habitacion verde"; h.dataset.num=n;
     h.innerHTML=`<div>${n}</div><span class="estado-label">VL</span>`;
 
-    // Pintado desde cache en memoria (que Firestore actualiza)
-    // Si aún no llega Firestore y estás offline, cache viene de localStorage
     const saved = getRoomData(piso, String(n));
     if(saved){
       if(saved.color){ h.className=`habitacion ${saved.color}`; setEtiqueta(h,saved.color); }
       if(saved.nota){ syncStar(h,saved.nota); }
     }
 
-    h.onclick=e=>{ e.stopPropagation(); seleccionarHabitacion(h,piso); if(window.abrirMenu) abrirMenu(e); };
+    h.onclick=e=>{ e.stopPropagation(); seleccionarHabitacion(h,piso); abrirMenu(e); };
     (n%2===0?colP:colI).appendChild(h);
   }
-
-  const wrap=document.createElement("div");
-  wrap.className="pasillo";
-  wrap.append(colP,colI);
-  mapa.appendChild(wrap);
+  const wrap=document.createElement("div"); wrap.className="pasillo"; wrap.append(colP,colI); mapa.appendChild(wrap);
 }
 
 /* ================== Interacción (paneles) ================== */
@@ -428,15 +411,13 @@ function actualizarPanelNota(){
     if(!hasOperator()){ alert("Identifícate primero."); return; }
     const nota = box.value.trim();
 
-    // Actualiza cache en memoria + local (optimista)
     upsertRoomData(p, num, { nota, fecha:ahoraStr(), por:localStorage.getItem("staffName") }, {persist:true});
     syncStar(habitacionSeleccionada,nota);
     setBadge("✅ Guardado");
     solicitarResumen();
 
-    // Sincroniza Firestore
     try { await window.syncRoom(num, { note: nota }); }
-    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); }
+    catch(e){ alert("No se pudo guardar en la nube. Revisa tu conexión."); console.warn(e); }
   };
 
   btnE.onclick=async ()=>{
@@ -448,7 +429,7 @@ function actualizarPanelNota(){
     solicitarResumen();
 
     try { await window.syncRoom(num, { note: "" }); }
-    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); }
+    catch(e){ alert("No se pudo eliminar en la nube. Revisa tu conexión."); console.warn(e); }
   };
 }
 
@@ -501,7 +482,7 @@ function actualizarPanelCamas(){
     setBadge("✅ Guardado"); solicitarResumen();
 
     try { await window.syncRoom(num, { beds: filas }); }
-    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); }
+    catch(e){ alert("No se pudo guardar camas en la nube. Revisa tu conexión."); console.warn(e); }
   };
 
   if(btnE) btnE.onclick=async ()=>{
@@ -512,7 +493,7 @@ function actualizarPanelCamas(){
     setBadge("🗑️ Eliminado"); solicitarResumen();
 
     try { await window.syncRoom(num, { beds: [] }); }
-    catch(e){ if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior."); }
+    catch(e){ alert("No se pudo eliminar camas en la nube. Revisa tu conexión."); console.warn(e); }
   };
 }
 
@@ -556,7 +537,6 @@ function pintarKpis(piso){
     ).join('')}
     <span class="chip">Total: <b>${Object.values(c).reduce((a,b)=>a+b,0)}</b></span>`;
 }
-
 function crearMiniHabitaciones(piso){
   const mapa = document.getElementById(`miniMapa${piso}`); if(!mapa) return;
   mapa.innerHTML = "";
@@ -574,18 +554,16 @@ function crearMiniHabitaciones(piso){
       if(saved.nota){ syncStar(h,saved.nota); }
     }
 
-    h.onclick=(e)=>{ e.stopPropagation(); seleccionarMini(h,piso); if(window.abrirMenu) abrirMenu(e); };
+    h.onclick=(e)=>{ e.stopPropagation(); seleccionarMini(h,piso); abrirMenu(e); };
     (n%2===0?colP:colI).appendChild(h);
   }
   const wrap=document.createElement("div"); wrap.className="pasillo"; wrap.append(colP,colI); mapa.appendChild(wrap);
 }
-
 function seleccionarMini(h,piso){
   document.querySelectorAll(`#miniMapa${piso} .habitacion.selected`).forEach(x=>x.classList.remove("selected"));
   habitacionSeleccionada=h; pisoActivo=piso; h.classList.add("selected");
   actualizarMiniResumen(piso);
 }
-
 function actualizarMiniResumen(piso){
   const num = habitacionSeleccionada?.dataset?.num;
   const resumen = document.getElementById(`miniResumen${piso}`);
@@ -616,7 +594,6 @@ function actualizarMiniResumen(piso){
       <p><strong>Últ. mod.:</strong> ${fechaTxt} <em>por</em> ${porTxt}</p>`;
   }
 }
-
 function renderResumenGlobal(){
   const wrap = document.getElementById("resumenView"); if(!wrap) return;
   wrap.innerHTML = "";
@@ -643,7 +620,6 @@ function renderResumenGlobal(){
 /* ====== Resumen (throttle + reloj) ====== */
 let needsResumen=true;
 function solicitarResumen(){ needsResumen=true; }
-
 function actualizarResumen(){
   const p=pisoActivo;
   const resumen=document.getElementById(`resumenContenido${p}`);
@@ -654,7 +630,6 @@ function actualizarResumen(){
     if(resumen) resumen.innerHTML="<p>Selecciona una habitación...</p>";
     return;
   }
-
   const num=String(habitacionSeleccionada.dataset.num);
   const saved=getRoomData(p, num) || {};
   const color=obtenerColor(habitacionSeleccionada);
@@ -675,54 +650,12 @@ function actualizarResumen(){
     <p><strong>Última modificación:</strong> ${fechaTxt}</p>
     <p><strong>Última modificación por:</strong> ${modifico}</p>`;
 }
-
 setInterval(()=>{
   if(needsResumen){ actualizarResumen(); needsResumen=false; }
   const p=pisoActivo;
   const reloj=document.getElementById(`reloj${p}`);
   if(reloj) reloj.textContent=new Date().toLocaleTimeString();
 },1000);
-
-/* ====== Bootstrap mínimo ====== */
-[2,3,4].forEach(crearPiso);
-pintarOperadorEnResumen();
-lockUI(!hasOperator());
-
-/* ================== Navegación de pisos (incluye modo Resumen) ================== */
-document.querySelectorAll(".btn-piso").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    if(btn.classList.contains("active")) return;
-
-    document.querySelectorAll(".btn-piso").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    const key = btn.dataset.piso;
-
-    menu.style.display="none";
-
-    if(key === "resumen"){
-      window.modoResumen = true;
-      document.querySelectorAll(".piso").forEach(p=>p.classList.remove("active"));
-      document.getElementById("resumenView").classList.add("active");
-      window.habitacionSeleccionada = null;
-      renderResumenGlobal();
-      lockUI(!hasOperator());
-    } else {
-      window.modoResumen = false;
-      document.getElementById("resumenView").classList.remove("active");
-
-      const piso = Number(key);
-      document.querySelectorAll(".piso").forEach(p=>p.classList.remove("active"));
-      document.getElementById(`piso${piso}`).classList.add("active");
-
-      window.pisoActivo = piso;
-      window.habitacionSeleccionada = null;
-      actualizarPanelNota();
-      actualizarPanelEstado();
-      actualizarPanelCamas();
-      solicitarResumen();
-    }
-  });
-});
 
 /* ================== Menú de colores ================== */
 function abrirMenu(e){
@@ -731,14 +664,11 @@ function abrirMenu(e){
   menu.style.top =`${e.clientY+10}px`;
   menu.style.display="block";
 }
-window.abrirMenu = abrirMenu;
-
 window.addEventListener("click",e=>{
   if(!menu.contains(e.target) && !e.target.classList.contains("habitacion")){
     menu.style.display="none";
   }
 });
-
 menu.querySelectorAll(".color-opcion").forEach(opt=>{
   opt.addEventListener("click", async ()=>{
     if(!habitacionSeleccionada) return;
@@ -748,11 +678,9 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
     const p     = pisoActivo;
     const num   = String(habitacionSeleccionada.dataset.num);
 
-    // UI inmediata (optimista)
     habitacionSeleccionada.className=`habitacion ${color}`;
     setEtiqueta(habitacionSeleccionada,color);
 
-    // Cache en memoria + local (optimista)
     const prev = getRoomData(p, num) || {};
     upsertRoomData(p, num, {
       color,
@@ -771,14 +699,273 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
       actualizarMiniResumen(p);
     }
 
-    // Firestore manda oficialmente (se reflejará de nuevo por realtime)
     try { await window.syncRoom(num, { status: color }); }
-    catch(e){
-      if(String(e.message).includes("OPERADOR_REQUERIDO")) alert("Identifícate en la tarjeta superior.");
-      console.warn(e);
-    }
+    catch(e){ alert("No se pudo sincronizar en la nube. Revisa tu conexión."); console.warn(e); }
   });
 });
+
+/* ================== INFORMES (solo lectura) ================== */
+let informesCache = [];
+
+function formatDT(ts){
+  try{
+    const d = ts?.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString();
+  } catch { return "—"; }
+}
+function detectAction(data){
+  if(!data) return { action: "—", detail: "—" };
+
+  if(Object.prototype.hasOwnProperty.call(data, "status")){
+    const s = data.status;
+    const label = COLOR_MAP[s]?.label || s;
+    const sigla = COLOR_MAP[s]?.sigla || "";
+    return { action: "Estado", detail: `${label} (${sigla})` };
+  }
+  if(Object.prototype.hasOwnProperty.call(data, "note")){
+    const has = (data.note || "").trim().length > 0;
+    return { action: "Nota", detail: has ? "Agregó/Actualizó nota" : "Eliminó nota" };
+  }
+  if(Object.prototype.hasOwnProperty.call(data, "beds")){
+    const beds = Array.isArray(data.beds) ? data.beds : [];
+    const txt = beds.length ? beds.map(b=>`${b.cantidad} ${b.tipo}`).join(", ") : "Sin registrar";
+    return { action: "Camas", detail: txt };
+  }
+  return { action: "Actualización", detail: "—" };
+}
+
+function renderInformesUI(){
+  const cont = document.getElementById("informesView");
+  if(!cont) return;
+
+  const todayISO = new Date().toISOString().slice(0,10);
+
+  cont.innerHTML = `
+    <div class="titulo-piso">📁 INFORMES (Historial)</div>
+
+    <div class="box" style="width:min(1100px, 96%);">
+      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:end;">
+        <div style="min-width:220px;">
+          <label style="font-size:12px;color:#555;">Fecha</label>
+          <input type="date" id="infDate" value="${todayISO}" />
+        </div>
+
+        <button class="btn primary" id="infBuscar">Buscar</button>
+        <button class="btn" id="infPdf">Descargar PDF</button>
+
+        <span class="badge" id="infBadge"></span>
+      </div>
+
+      <div class="hint" style="margin-top:8px;">
+        Vista de solo lectura. Aquí no se puede editar nada.
+      </div>
+    </div>
+
+    <div class="box" style="width:min(1100px, 96%); overflow:auto;">
+      <table id="infTable">
+        <thead>
+          <tr>
+            <th>Fecha / Hora</th>
+            <th>Habitación</th>
+            <th>Acción</th>
+            <th>Detalle</th>
+            <th>Operador</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td colspan="5">Selecciona una fecha y presiona Buscar…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  document.getElementById("infBuscar").onclick = async () => { await cargarInformesTabla(); };
+  document.getElementById("infPdf").onclick = async () => { await descargarParteDiarioPDFDesdeInformes(); };
+
+  cargarInformesTabla();
+}
+
+async function cargarInformesTabla(){
+  const badge = document.getElementById("infBadge");
+  const tbody = document.querySelector("#infTable tbody");
+  const dateISO = document.getElementById("infDate")?.value;
+
+  if(!tbody || !dateISO) return;
+
+  badge.textContent = "Cargando…";
+
+  const start = new Date(dateISO + "T00:00:00");
+  const end = new Date(dateISO + "T00:00:00");
+  end.setDate(end.getDate() + 1);
+
+  try{
+    const rows = await window.fetchAuditRange(start, end);
+    informesCache = rows;
+
+    if(rows.length === 0){
+      tbody.innerHTML = `<tr><td colspan="5">No hay movimientos en ese día.</td></tr>`;
+      badge.textContent = "0 registros";
+      return;
+    }
+
+    tbody.innerHTML = rows.map(e=>{
+      const room = e.roomId || "—";
+      const by = e.by || "—";
+      const dt = formatDT(e.at);
+      const {action, detail} = detectAction(e.data);
+      return `<tr>
+        <td>${dt}</td>
+        <td>${room}</td>
+        <td>${action}</td>
+        <td>${detail}</td>
+        <td>${by}</td>
+      </tr>`;
+    }).join("");
+
+    badge.textContent = `${rows.length} registros`;
+  } catch(err){
+    console.error(err);
+    tbody.innerHTML = `<tr><td colspan="5">Error cargando informes. Revisa consola (F12).</td></tr>`;
+    badge.textContent = "Error";
+  }
+}
+
+async function descargarParteDiarioPDFDesdeInformes(){
+  try{
+    if(!hasOperator()){
+      alert("Identifícate primero (esto deja constancia de quién generó el PDF).");
+      return;
+    }
+
+    if(!informesCache){
+      await cargarInformesTabla();
+    }
+
+    const dateISO = document.getElementById("infDate")?.value || new Date().toISOString().slice(0,10);
+    const operator = localStorage.getItem("staffName") || "—";
+    const audit = informesCache || [];
+
+    let total = audit.length, estado=0, nota=0, camas=0;
+    const porOperador = {};
+    audit.forEach(e=>{
+      const by = e.by || "—";
+      porOperador[by] = (porOperador[by]||0) + 1;
+      if(e.data && "status" in e.data) estado++;
+      else if(e.data && "note" in e.data) nota++;
+      else if(e.data && "beds" in e.data) camas++;
+    });
+
+    const topOps = Object.entries(porOperador).sort((a,b)=>b[1]-a[1]).slice(0,5);
+
+    const tableRows = audit.map(e=>{
+      const dt = formatDT(e.at);
+      const room = e.roomId || "—";
+      const by = e.by || "—";
+      const {action, detail} = detectAction(e.data);
+      return [dt, room, action, detail, by];
+    });
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ unit:"pt", format:"a4" });
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.text("Parte Diario — Control de Habitaciones", 40, 40);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.text("Hotel: Lord Pierre", 40, 60);
+    doc.text(`Fecha: ${dateISO}`, 40, 74);
+    doc.text(`Generado por: ${operator}`, 40, 88);
+    doc.text(`Hora: ${new Date().toLocaleString()}`, 40, 102);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Resumen del día", 40, 128);
+
+    doc.setFont("helvetica", "normal");
+    doc.text(`Total acciones: ${total}`, 40, 146);
+    doc.text(`Cambios de estado: ${estado}`, 40, 160);
+    doc.text(`Notas: ${nota}`, 40, 174);
+    doc.text(`Camas: ${camas}`, 40, 188);
+
+    doc.setFont("helvetica", "bold");
+    doc.text("Actividad por operador (Top)", 40, 212);
+    doc.setFont("helvetica", "normal");
+
+    let y = 228;
+    if(topOps.length === 0){
+      doc.text("—", 40, y); y += 14;
+    } else {
+      topOps.forEach(([name,count])=>{
+        doc.text(`• ${name}: ${count}`, 40, y);
+        y += 14;
+      });
+    }
+
+    doc.autoTable({
+      startY: y + 10,
+      head: [["Fecha/Hora","Habitación","Acción","Detalle","Operador"]],
+      body: tableRows.length ? tableRows : [["—","—","—","No hay movimientos en el día.","—"]],
+      styles: { fontSize: 9, cellPadding: 4, overflow: "linebreak" }
+    });
+
+    doc.save(`ParteDiario_LordPierre_${dateISO}.pdf`);
+  } catch(err){
+    console.error(err);
+    alert("No se pudo generar el PDF. Revisa la consola (F12) para ver el error.");
+  }
+}
+
+/* ================== Navegación (pisos, resumen, informes) ================== */
+document.querySelectorAll(".btn-piso").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    if(btn.classList.contains("active")) return;
+
+    document.querySelectorAll(".btn-piso").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const key = btn.dataset.piso;
+    menu.style.display="none";
+
+    // Oculta vistas
+    document.querySelectorAll(".piso").forEach(p=>p.classList.remove("active"));
+    document.getElementById("resumenView").classList.remove("active");
+
+    if(key === "resumen"){
+      modoResumen = true;
+      document.getElementById("resumenView").classList.add("active");
+      habitacionSeleccionada = null;
+      renderResumenGlobal();
+      lockUI(!hasOperator());
+      return;
+    }
+
+    if(key === "informes"){
+      modoResumen = false;
+      document.getElementById("informesView").classList.add("active");
+      habitacionSeleccionada = null;
+      renderInformesUI();
+      // Nota: informes es lectura; pero exigimos operador para descargar PDF dentro de la función.
+      return;
+    }
+
+    // Vista por piso
+    modoResumen = false;
+    const piso = Number(key);
+    document.getElementById(`piso${piso}`).classList.add("active");
+    pisoActivo = piso;
+    habitacionSeleccionada = null;
+    actualizarPanelNota();
+    actualizarPanelEstado();
+    actualizarPanelCamas();
+    solicitarResumen();
+  });
+});
+
+/* ====== Bootstrap ====== */
+[2,3,4].forEach(crearPiso);
+pintarOperadorEnResumen();
+lockUI(!hasOperator());
 </script>
 
 <!-- === Firebase + Realtime === -->
@@ -786,7 +973,8 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
   import {
     getFirestore, collection, doc, onSnapshot, setDoc,
-    serverTimestamp, addDoc
+    serverTimestamp, addDoc,
+    query, where, getDocs, orderBy
   } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -798,6 +986,7 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
 
+  // Collections
   const HOTEL_ID = "lord-pierre";
   const roomsCol = collection(db, "hotels", HOTEL_ID, "rooms");
   const auditCol = collection(db, "hotels", HOTEL_ID, "audit");
@@ -808,6 +997,7 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
     return by.trim();
   }
 
+  // Escritura con auditoría
   window.syncRoom = async (roomId, data) => {
     const by = getStaffName();
     const payload = { ...data, updatedBy: by, updatedAt: serverTimestamp() };
@@ -815,64 +1005,57 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
     await addDoc(auditCol, { roomId: String(roomId), by, at: serverTimestamp(), data });
   };
 
-  window.setRoomStatus = async (roomId, status) => window.syncRoom(roomId, { status });
+  // SOLO LECTURA: historial por rango
+  window.fetchAuditRange = async (startDate, endDate) => {
+    const q = query(
+      auditCol,
+      where("at", ">=", startDate),
+      where("at", "<", endDate),
+      orderBy("at", "asc")
+    );
 
-  // Realtime → Firestore MANDA → actualiza cache en memoria + DOM
+    const snap = await getDocs(q);
+    const rows = [];
+    snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
+    return rows;
+  };
+
+  // Realtime rooms → actualiza cache + UI
   onSnapshot(roomsCol, (snap) => {
-    // En cuanto llega el primer snapshot, ya consideramos a Firestore como “ready”
-    window.firestoreReady = true;
-
     const rooms = [];
     snap.forEach((d) => rooms.push({ id: d.id, ...d.data() }));
-
+    // delega a renderer global
     if (window.renderRooms) window.renderRooms(rooms);
   });
 </script>
 
 <script>
-/* ================== Realtime Firestore → Cache + DOM ================== */
+/* ================== Realtime Rooms → Cache + DOM ================== */
 window.renderRooms = (rooms) => {
   rooms.forEach(r => {
     const idStr = String(r.id);
     const status = r.status || "verde";
     const nota   = r.note   || "";
     const camas  = r.beds   || [];
-    const fecha  = (r.updatedAt && r.updatedAt.toDate) ? r.updatedAt.toDate().toLocaleString() : ahoraStr();
+    const fecha  = (r.updatedAt && r.updatedAt.toDate) ? r.updatedAt.toDate().toLocaleString() : new Date().toLocaleString();
     const por    = r.updatedBy || r.by || "";
 
     const piso = Number(idStr[0]);
     if(![2,3,4].includes(piso)) return;
 
-    // Firestore manda: metemos en cache en memoria + persistimos como respaldo offline
+    // Firestore manda: a cache + local (offline)
     upsertRoomData(piso, idStr, { color: status, nota, camas, fecha, por }, {persist:true});
 
-    // Actualiza habitación en DOM (grande)
-    const bigEl = document.querySelector(`.piso.active .habitacion[data-num="${idStr}"]`)
-               || document.querySelector(`.habitacion[data-num="${idStr}"]`);
-    if(bigEl){
-      bigEl.className = `habitacion ${status}`;
-      setEtiqueta(bigEl, status);
-      syncStar(bigEl, nota);
-    }
+    // Actualiza DOM (cualquier vista que tenga esa habitación)
+    document.querySelectorAll(`.habitacion[data-num="${idStr}"]`).forEach(el=>{
+      el.className = `habitacion ${status}`;
+      setEtiqueta(el, status);
+      syncStar(el, nota);
+    });
 
-    // Mini-mapa
-    const miniEl = document.querySelector(`#miniMapa${piso} .habitacion[data-num="${idStr}"]`);
-    if(miniEl){
-      miniEl.className = `habitacion ${status}`;
-      setEtiqueta(miniEl, status);
-      syncStar(miniEl, nota);
-    }
-
-    // Refresca KPIs/paneles
-    if(window.modoResumen){
+    // Si estás en resumen, refresca KPIs
+    if(modoResumen){
       pintarKpis(piso);
-      if(miniEl && miniEl.classList.contains("selected")) actualizarMiniResumen(piso);
-    } else {
-      if(habitacionSeleccionada && String(habitacionSeleccionada.dataset.num) === idStr){
-        actualizarPanelNota();
-        actualizarPanelEstado();
-        solicitarResumen();
-      }
     }
   });
 };
