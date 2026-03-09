@@ -335,6 +335,7 @@ function crearPiso(piso){
         ${Object.entries(COLOR_MAP).map(([k,v])=>`
           <div class="leyenda-item"><div class="leyenda-color" style="background:var(--${k})"></div>${v.label} (${v.sigla})</div>`).join("")}
       </div>
+
       <div class="box">
         <h3 id="notaTitulo${piso}">📋 Nota de habitación</h3>
         <textarea id="notaTexto${piso}" placeholder="Escribe aquí la nota..." disabled></textarea>
@@ -344,6 +345,17 @@ function crearPiso(piso){
           <span id="badge${piso}" class="badge"></span>
         </div>
       </div>
+
+      <div class="box">
+        <h3 id="tipoTitulo${piso}">🛎️ Tipo de habitación</h3>
+        <input type="text" id="tipoTexto${piso}" placeholder="Escribe el nombre o tipo..." disabled />
+        <div class="actions">
+          <button id="btnGuardarTipo${piso}" class="btn primary" disabled>Guardar</button>
+          <button id="btnEliminarTipo${piso}" class="btn danger" disabled>Eliminar</button>
+          <span id="badgeTipo${piso}" class="badge"></span>
+        </div>
+      </div>
+
       <div class="box"><div class="estado"><span class="swatch" id="swatch${piso}"></span><span id="estadoTexto${piso}">Sin selección.</span></div></div>
     </div>
   </div>`;
@@ -386,7 +398,11 @@ function seleccionarHabitacion(h,piso){
   if(!h) return;
   document.querySelectorAll(`#piso${piso} .habitacion.selected`).forEach(x=>x.classList.remove("selected"));
   habitacionSeleccionada=h; pisoActivo=piso; h.classList.add("selected");
-  actualizarPanelNota(); actualizarPanelEstado(); actualizarPanelCamas(); solicitarResumen();
+  actualizarPanelNota();
+  actualizarPanelTipoHabitacion();
+  actualizarPanelEstado();
+  actualizarPanelCamas();
+  solicitarResumen();
 }
 
 function actualizarPanelNota(){
@@ -425,11 +441,82 @@ function actualizarPanelNota(){
 
     upsertRoomData(p, num, { nota:"", fecha:ahoraStr(), por:localStorage.getItem("staffName") }, {persist:true});
     box.value=""; syncStar(habitacionSeleccionada,"");
+    titulo.textContent=`📋 Nota de habitación ${num}`;
     setBadge("🗑️ Eliminado");
     solicitarResumen();
 
     try { await window.syncRoom(num, { note: "" }); }
     catch(e){ alert("No se pudo eliminar en la nube. Revisa tu conexión."); console.warn(e); }
+  };
+}
+
+function actualizarPanelTipoHabitacion(){
+  const p=pisoActivo;
+  const input=document.getElementById(`tipoTexto${p}`);
+  const titulo=document.getElementById(`tipoTitulo${p}`);
+  const btnG=document.getElementById(`btnGuardarTipo${p}`);
+  const btnE=document.getElementById(`btnEliminarTipo${p}`);
+  const badge=document.getElementById(`badgeTipo${p}`);
+
+  if(!input || !titulo || !btnG || !btnE || !badge) return;
+
+  if(!habitacionSeleccionada){
+    input.disabled=true;
+    btnG.disabled=true;
+    btnE.disabled=true;
+    input.value="";
+    titulo.textContent="🛎️ Tipo de habitación";
+    return;
+  }
+
+  const num=String(habitacionSeleccionada.dataset.num);
+  const saved=getRoomData(p, num) || {};
+
+  input.disabled=false;
+  btnG.disabled=false;
+  btnE.disabled=false;
+  input.value=saved.tipoHabitacion || "";
+  titulo.textContent=`🛎️ Tipo de habitación ${num}`;
+
+  const setBadge=m=>{ badge.textContent=m; setTimeout(()=>badge.textContent="",1200); };
+
+  btnG.onclick=async ()=>{
+    if(!hasOperator()){ alert("Identifícate primero."); return; }
+
+    const tipoHabitacion = input.value.trim();
+    if(!tipoHabitacion){
+      alert("Escribe el nombre o tipo de habitación antes de guardar.");
+      return;
+    }
+
+    upsertRoomData(p, num, {
+      tipoHabitacion,
+      fecha:ahoraStr(),
+      por:localStorage.getItem("staffName")
+    }, {persist:true});
+
+    setBadge("✅ Guardado");
+    solicitarResumen();
+
+    try { await window.syncRoom(num, { roomType: tipoHabitacion }); }
+    catch(e){ alert("No se pudo guardar el tipo de habitación en la nube. Revisa tu conexión."); console.warn(e); }
+  };
+
+  btnE.onclick=async ()=>{
+    if(!hasOperator()){ alert("Identifícate primero."); return; }
+
+    upsertRoomData(p, num, {
+      tipoHabitacion:"",
+      fecha:ahoraStr(),
+      por:localStorage.getItem("staffName")
+    }, {persist:true});
+
+    input.value="";
+    setBadge("🗑️ Eliminado");
+    solicitarResumen();
+
+    try { await window.syncRoom(num, { roomType: "" }); }
+    catch(e){ alert("No se pudo eliminar el tipo de habitación en la nube. Revisa tu conexión."); console.warn(e); }
   };
 }
 
@@ -584,11 +671,13 @@ function actualizarMiniResumen(piso){
 
   const camasTxt = (saved.camas && saved.camas.length) ? saved.camas.map(c=>`${c.cantidad} ${c.tipo}`).join(", ") : "Sin registrar";
   const notaTxt  = saved.nota || "—";
+  const tipoTxt  = saved.tipoHabitacion || "Sin definir";
   const fechaTxt = saved.fecha || "Sin registrar";
   const porTxt   = saved.por || "—";
 
   if(resumen){
     resumen.innerHTML = `
+      <p><strong>Tipo:</strong> ${tipoTxt}</p>
       <p><strong>Camas:</strong> ${camasTxt}</p>
       <p><strong>Nota:</strong> ${notaTxt}</p>
       <p><strong>Últ. mod.:</strong> ${fechaTxt} <em>por</em> ${porTxt}</p>`;
@@ -635,6 +724,7 @@ function actualizarResumen(){
   const color=obtenerColor(habitacionSeleccionada);
   const meta=COLOR_MAP[color];
 
+  const tipoTxt=(saved.tipoHabitacion && saved.tipoHabitacion.trim()) ? saved.tipoHabitacion : "Sin definir";
   const camasTxt=(saved.camas&&saved.camas.length)? saved.camas.map(c=>`${c.cantidad} ${c.tipo}`).join(", "):"Sin registrar";
   const notaTxt=saved.nota||"—";
   const fechaTxt=saved.fecha||"Sin registrar";
@@ -644,6 +734,7 @@ function actualizarResumen(){
   if(resumen) resumen.innerHTML=`
     <p><strong>Operador activo:</strong> ${operadorActivo}</p>
     <p><strong>Habitación:</strong> ${num}</p>
+    <p><strong>Tipo:</strong> ${tipoTxt}</p>
     <p><strong>Estado:</strong> ${meta.label}</p>
     <p><strong>Camas:</strong> ${camasTxt}</p>
     <p><strong>Última nota:</strong> ${notaTxt}</p>
@@ -686,6 +777,7 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
       color,
       nota:  prev.nota || "",
       camas: prev.camas || [],
+      tipoHabitacion: prev.tipoHabitacion || "",
       fecha: ahoraStr(),
       por:   localStorage.getItem("staffName")
     }, {persist:true});
@@ -730,6 +822,10 @@ function detectAction(data){
     const beds = Array.isArray(data.beds) ? data.beds : [];
     const txt = beds.length ? beds.map(b=>`${b.cantidad} ${b.tipo}`).join(", ") : "Sin registrar";
     return { action: "Camas", detail: txt };
+  }
+  if(Object.prototype.hasOwnProperty.call(data, "roomType")){
+    const txt = (data.roomType || "").trim();
+    return { action: "Tipo de habitación", detail: txt ? txt : "Eliminó tipo de habitación" };
   }
   return { action: "Actualización", detail: "—" };
 }
@@ -845,7 +941,7 @@ async function descargarParteDiarioPDFDesdeInformes(){
     const operator = localStorage.getItem("staffName") || "—";
     const audit = informesCache || [];
 
-    let total = audit.length, estado=0, nota=0, camas=0;
+    let total = audit.length, estado=0, nota=0, camas=0, tipos=0;
     const porOperador = {};
     audit.forEach(e=>{
       const by = e.by || "—";
@@ -853,6 +949,7 @@ async function descargarParteDiarioPDFDesdeInformes(){
       if(e.data && "status" in e.data) estado++;
       else if(e.data && "note" in e.data) nota++;
       else if(e.data && "beds" in e.data) camas++;
+      else if(e.data && "roomType" in e.data) tipos++;
     });
 
     const topOps = Object.entries(porOperador).sort((a,b)=>b[1]-a[1]).slice(0,5);
@@ -887,12 +984,13 @@ async function descargarParteDiarioPDFDesdeInformes(){
     doc.text(`Cambios de estado: ${estado}`, 40, 160);
     doc.text(`Notas: ${nota}`, 40, 174);
     doc.text(`Camas: ${camas}`, 40, 188);
+    doc.text(`Tipos de habitación: ${tipos}`, 40, 202);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Actividad por operador (Top)", 40, 212);
+    doc.text("Actividad por operador (Top)", 40, 226);
     doc.setFont("helvetica", "normal");
 
-    let y = 228;
+    let y = 242;
     if(topOps.length === 0){
       doc.text("—", 40, y); y += 14;
     } else {
@@ -945,7 +1043,6 @@ document.querySelectorAll(".btn-piso").forEach(btn=>{
       document.getElementById("informesView").classList.add("active");
       habitacionSeleccionada = null;
       renderInformesUI();
-      // Nota: informes es lectura; pero exigimos operador para descargar PDF dentro de la función.
       return;
     }
 
@@ -956,6 +1053,7 @@ document.querySelectorAll(".btn-piso").forEach(btn=>{
     pisoActivo = piso;
     habitacionSeleccionada = null;
     actualizarPanelNota();
+    actualizarPanelTipoHabitacion();
     actualizarPanelEstado();
     actualizarPanelCamas();
     solicitarResumen();
@@ -1024,7 +1122,6 @@ lockUI(!hasOperator());
   onSnapshot(roomsCol, (snap) => {
     const rooms = [];
     snap.forEach((d) => rooms.push({ id: d.id, ...d.data() }));
-    // delega a renderer global
     if (window.renderRooms) window.renderRooms(rooms);
   });
 </script>
@@ -1037,25 +1134,32 @@ window.renderRooms = (rooms) => {
     const status = r.status || "verde";
     const nota   = r.note   || "";
     const camas  = r.beds   || [];
+    const tipoHabitacion = r.roomType || "";
     const fecha  = (r.updatedAt && r.updatedAt.toDate) ? r.updatedAt.toDate().toLocaleString() : new Date().toLocaleString();
     const por    = r.updatedBy || r.by || "";
 
     const piso = Number(idStr[0]);
     if(![2,3,4].includes(piso)) return;
 
-    // Firestore manda: a cache + local (offline)
-    upsertRoomData(piso, idStr, { color: status, nota, camas, fecha, por }, {persist:true});
+    upsertRoomData(piso, idStr, { color: status, nota, camas, tipoHabitacion, fecha, por }, {persist:true});
 
-    // Actualiza DOM (cualquier vista que tenga esa habitación)
     document.querySelectorAll(`.habitacion[data-num="${idStr}"]`).forEach(el=>{
       el.className = `habitacion ${status}`;
       setEtiqueta(el, status);
       syncStar(el, nota);
     });
 
-    // Si estás en resumen, refresca KPIs
+    if(habitacionSeleccionada && String(habitacionSeleccionada.dataset.num) === idStr && pisoActivo === piso){
+      actualizarPanelNota();
+      actualizarPanelTipoHabitacion();
+      actualizarPanelEstado();
+      actualizarPanelCamas();
+      solicitarResumen();
+    }
+
     if(modoResumen){
       pintarKpis(piso);
+      actualizarMiniResumen(piso);
     }
   });
 };
