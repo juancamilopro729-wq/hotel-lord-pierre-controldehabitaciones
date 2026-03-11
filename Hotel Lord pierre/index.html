@@ -21,12 +21,10 @@
   *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;}
   body{background:#f9fafb;display:flex;height:100vh;overflow:hidden;}
 
-  /* Logo fijo */
   .logo-fijo{position:fixed;bottom:10px;right:10px;z-index:50;opacity:.6;transition:.3s}
   .logo-fijo:hover{opacity:1}
   .logo-fijo img{height:50px;width:auto;object-fit:contain;filter:drop-shadow(0 1px 2px rgba(0,0,0,.2));pointer-events:none;user-select:none}
 
-  /* Sidebar */
   .sidebar{
     background:var(--gris-panel);
     width:220px; display:flex; flex-direction:column; align-items:center;
@@ -41,7 +39,6 @@
   .btn-piso:hover{filter:brightness(.95);}
   .btn-piso.active{background:#fff;color:var(--azul);border:2px solid var(--azul);}
 
-  /* Main */
   .main{flex:1; display:flex; flex-direction:column; align-items:center; padding:18px; overflow-y:auto; position:relative;}
   .piso{
     opacity:0; transform:translateX(100%); position:absolute; transition:.45s ease;
@@ -50,11 +47,9 @@
   .piso.active{opacity:1; transform:translateX(0); position:relative;}
   .titulo-piso{font-size:22px;margin:6px 0 16px;font-weight:800;}
 
-  /* Layout interno por piso */
   .contenedor{display:flex;flex-direction:column;align-items:center;gap:20px;}
   @media(min-width:900px){.contenedor{flex-direction:row;align-items:flex-start;gap:56px;}}
 
-  /* Mapa grande */
   .mapa{
     background:#4b5563; padding:22px; border-radius:14px;
     display:flex; justify-content:center; gap:28px; flex-wrap:wrap;
@@ -62,7 +57,6 @@
   .columna{display:flex;flex-direction:column;gap:10px;}
   .pasillo{display:flex;justify-content:space-between;width:100%;gap:80px;}
 
-  /* Habitación */
   .habitacion{
     width:70px;height:54px;border-radius:14px;color:#000;font-weight:800;
     display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -75,7 +69,6 @@
   .estado-label{position:absolute;bottom:4px;font-size:11px;font-weight:700;color:#000;text-shadow:0 1px 2px #fff8;}
   .estrella-nota{position:absolute;top:6px;right:8px;color:var(--estrella);font-size:18px;line-height:1;}
 
-  /* Paneles laterales */
   .panel{display:flex;flex-direction:column;align-items:center;gap:16px;width:92%;max-width:380px;}
   .box{background:#fff;border:1px solid var(--borde);border-radius:12px;padding:16px;width:100%;box-shadow:0 1px 4px rgba(0,0,0,.06);}
   .box h3{margin-bottom:10px;font-size:16px;}
@@ -93,24 +86,20 @@
   .resumen p{margin:6px 0;font-size:14px;line-height:1.4;}
   textarea{width:100%;height:110px;border:1px solid #ccc;border-radius:10px;resize:none;padding:10px;font-size:14px;background:#f9fafb;}
 
-  /* Formularios */
   select, input[type="number"], input[type="text"], input[type="date"]{
     width:100%;padding:8px;border:1px solid #d1d5db;border-radius:8px;background:#fff;
   }
   .delete-btn{background:none;border:none;color:#ef4444;font-size:16px;cursor:pointer;}
 
-  /* Menú de colores */
   .menu-colores{
     display:none; position:fixed; background:#fff; border:1px solid #ccc; border-radius:8px;
     padding:6px; box-shadow:0 0 12px rgba(0,0,0,.2); z-index:1000;
   }
   .color-opcion{width:30px;height:30px;border-radius:6px;margin:6px;display:inline-block;cursor:pointer;border:1px solid #9994;}
 
-  /* Estado bloqueado */
   .blocked { opacity:.6; pointer-events:none; }
   .hint { font-size:12px; color:#6b7280; margin-top:6px; }
 
-  /* Caja intervención */
   .intervencion-grid{
     display:grid;
     grid-template-columns:1fr;
@@ -146,13 +135,18 @@
   .dot.terminada{background:var(--verde);}
   .muted{color:var(--gris-texto);}
 
-  /* Tabla ERP + tabla informes */
+  .filtros-informes{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    gap:10px;
+    align-items:end;
+  }
+
   table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;}
   th, td{border-bottom:1px solid #e5e7eb;padding:8px;text-align:left;}
   th{background:#f3f4f6;font-weight:700;}
   tr:hover td{background:#f9fafb;}
 
-  /* ======== RESUMEN (tres columnas) ======== */
   .resumen-multi{ display:none; width:100%; }
   .resumen-multi.active{
     display:grid;
@@ -190,7 +184,6 @@
     .resumen-multi.active{ grid-template-columns:1fr; }
   }
 
-  /* Laptop 1366–1440px */
   @media (min-width:1200px) and (max-width:1440px){
     .resumen-multi.active{ grid-template-columns: repeat(3, minmax(0, 1fr)) !important; gap: 8px !important; padding: 0 !important; }
     .resumen-card{ max-width: 380px !important; padding: 8px !important; margin: 0 !important; box-shadow:0 1px 3px rgba(0,0,0,.05) !important;}
@@ -204,10 +197,8 @@
 
 <body>
 
-<!-- Logo -->
 <div class="logo-fijo"><img src="logo-lordpierre.png" alt="Hotel Lord Pierre" /></div>
 
-<!-- Sidebar -->
 <div class="sidebar">
   <button class="btn-piso active" data-piso="2">🏨 Piso 2</button>
   <button class="btn-piso" data-piso="3">🏨 Piso 3</button>
@@ -216,20 +207,14 @@
   <button class="btn-piso" data-piso="informes">📁 INFORMES</button>
 </div>
 
-<!-- Main -->
 <div class="main">
   <div id="piso2" class="piso active"></div>
   <div id="piso3" class="piso"></div>
   <div id="piso4" class="piso"></div>
-
-  <!-- Resumen -->
   <div id="resumenView" class="resumen-multi"></div>
-
-  <!-- Informes (solo lectura) -->
   <div id="informesView" class="piso"></div>
 </div>
 
-<!-- Menú de colores -->
 <div class="menu-colores" id="menu">
   <div class="color-opcion" data-color="verde"   style="background:var(--verde)"   title="Vacío limpio (VL)"></div>
   <div class="color-opcion" data-color="naranja" style="background:var(--naranja)" title="Vacío sucio (VS)"></div>
@@ -237,12 +222,10 @@
   <div class="color-opcion" data-color="rojo"    style="background:var(--rojo)"    title="Bloqueado (BL)"></div>
 </div>
 
-<!-- Librerías PDF -->
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.3/dist/jspdf.plugin.autotable.min.js"></script>
 
 <script>
-/* ================== Datos base ================== */
 const pisos={2:{inicio:200,fin:221},3:{inicio:300,fin:319},4:{inicio:400,fin:421}};
 const COLOR_MAP={
   verde:{label:'Vacío limpio',sigla:'VL'},
@@ -257,11 +240,10 @@ const INTERVENCION_MAP={
 
 let pisoActivo=2,habitacionSeleccionada=null,modoResumen=false;
 const menu=document.getElementById("menu");
-
-/* ================== Cache en memoria ================== */
 const roomCache = {2:{},3:{},4:{}};
+let informesCache = [];
+let informesVistaActual = "general";
 
-/* ================== LocalStorage ================== */
 function safeReadAll(){
   try{ return JSON.parse(localStorage.getItem("datosHabitaciones")) || {2:{},3:{},4:{}}; }
   catch{ return {2:{},3:{},4:{}}; }
@@ -282,12 +264,10 @@ function getDefaultIntervencion(){
     actualizadaPor:""
   };
 }
-
 function normalizeRoomData(data={}){
   const intervencion = { ...getDefaultIntervencion(), ...(data.intervencion || {}) };
   return { ...data, intervencion };
 }
-
 function getRoomData(piso,num){
   const raw = (roomCache?.[piso]?.[num]) || {};
   return normalizeRoomData(raw);
@@ -320,8 +300,12 @@ function formatDateDisplay(iso){
   if(Number.isNaN(d.getTime())) return iso;
   return d.toLocaleDateString();
 }
-
-/* ================== Operador ================== */
+function formatDT(ts){
+  try{
+    const d = ts?.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString();
+  } catch { return "—"; }
+}
 function hasOperator(){ const n=localStorage.getItem("staffName"); return !!(n&&n.trim().length>=2); }
 function setOperator(name){
   const s=(name||"").trim();
@@ -355,8 +339,6 @@ function pintarOperadorEnResumen(){
     el.textContent=name?`Operador: ${name}`:"Operador: —";
   });
 }
-
-/* ================== Utilidades UI ================== */
 function obtenerColor(h){ return [...h.classList].find(c=>Object.keys(COLOR_MAP).includes(c))||"verde"; }
 function setEtiqueta(h,color){ const e=h.querySelector(".estado-label"); if(e) e.textContent=COLOR_MAP[color].sigla; }
 function syncStar(h,nota){
@@ -371,7 +353,17 @@ function syncStar(h,nota){
 }
 const ahoraStr = ()=> new Date().toLocaleString();
 
-/* ================== Construcción de UI por piso ================== */
+function isCleaningTransition(data){
+  if(!data) return false;
+  if(data.statusChange){
+    return data.statusChange.from === "naranja" && data.statusChange.to === "verde";
+  }
+  if(data.previousStatus && data.status){
+    return data.previousStatus === "naranja" && data.status === "verde";
+  }
+  return false;
+}
+
 function crearPiso(piso){
   const cont=document.getElementById(`piso${piso}`);
   cont.innerHTML=`
@@ -527,7 +519,6 @@ function crearHabitaciones(piso){
   const wrap=document.createElement("div"); wrap.className="pasillo"; wrap.append(colP,colI); mapa.appendChild(wrap);
 }
 
-/* ================== Interacción (paneles) ================== */
 function seleccionarHabitacion(h,piso){
   if(!h) return;
   document.querySelectorAll(`#piso${piso} .habitacion.selected`).forEach(x=>x.classList.remove("selected"));
@@ -916,7 +907,6 @@ function agregarFilaCama(p,cantidad="",tipo=""){
   if(tabla) tabla.appendChild(tr);
 }
 
-/* ====== KPIs + mini mapas (Resumen) ====== */
 function contarPorColor(piso){
   const counts = {verde:0,naranja:0,amarillo:0,rojo:0};
   for(let n=pisos[piso].inicio;n<=pisos[piso].fin;n++){
@@ -1024,7 +1014,6 @@ function renderResumenGlobal(){
   });
 }
 
-/* ====== Resumen (throttle + reloj) ====== */
 let needsResumen=true;
 function solicitarResumen(){ needsResumen=true; }
 function actualizarResumen(){
@@ -1075,7 +1064,6 @@ setInterval(()=>{
   if(reloj) reloj.textContent=new Date().toLocaleTimeString();
 },1000);
 
-/* ================== Menú de colores ================== */
 function abrirMenu(e){
   if(!hasOperator()){ alert("Identifícate primero."); return; }
   menu.style.left=`${e.clientX+10}px`;
@@ -1095,17 +1083,18 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
     const color = opt.dataset.color;
     const p     = pisoActivo;
     const num   = String(habitacionSeleccionada.dataset.num);
+    const prevData = getRoomData(p, num) || {};
+    const previousStatus = prevData.color || obtenerColor(habitacionSeleccionada);
 
     habitacionSeleccionada.className=`habitacion ${color}`;
     setEtiqueta(habitacionSeleccionada,color);
 
-    const prev = getRoomData(p, num) || {};
     upsertRoomData(p, num, {
       color,
-      nota:  prev.nota || "",
-      camas: prev.camas || [],
-      tipoHabitacion: prev.tipoHabitacion || "",
-      intervencion: prev.intervencion || getDefaultIntervencion(),
+      nota:  prevData.nota || "",
+      camas: prevData.camas || [],
+      tipoHabitacion: prevData.tipoHabitacion || "",
+      intervencion: prevData.intervencion || getDefaultIntervencion(),
       fecha: ahoraStr(),
       por:   localStorage.getItem("staffName")
     }, {persist:true});
@@ -1119,22 +1108,34 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
       actualizarMiniResumen(p);
     }
 
-    try { await window.syncRoom(num, { status: color }); }
+    try {
+      await window.syncRoom(num, {
+        status: color,
+        previousStatus,
+        statusChange: {
+          from: previousStatus,
+          to: color
+        }
+      });
+    }
     catch(e){ alert("No se pudo sincronizar en la nube. Revisa tu conexión."); console.warn(e); }
   });
 });
 
-/* ================== INFORMES (solo lectura) ================== */
-let informesCache = [];
-
-function formatDT(ts){
-  try{
-    const d = ts?.toDate ? ts.toDate() : new Date(ts);
-    return d.toLocaleString();
-  } catch { return "—"; }
-}
 function detectAction(data){
   if(!data) return { action: "—", detail: "—" };
+
+  if(data.statusChange){
+    const from = data.statusChange.from;
+    const to = data.statusChange.to;
+    const fromTxt = COLOR_MAP[from]?.sigla || from || "—";
+    const toTxt = COLOR_MAP[to]?.sigla || to || "—";
+
+    if(isCleaningTransition(data)){
+      return { action: "Aseo", detail: `${fromTxt} → ${toTxt}` };
+    }
+    return { action: "Estado", detail: `${fromTxt} → ${toTxt}` };
+  }
 
   if(Object.prototype.hasOwnProperty.call(data, "status")){
     const s = data.status;
@@ -1168,6 +1169,16 @@ function detectAction(data){
   return { action: "Actualización", detail: "—" };
 }
 
+function filtrarRowsPorVista(rows, tipoReporte){
+  if(tipoReporte === "aseos"){
+    return rows.filter(r => isCleaningTransition(r.data));
+  }
+  if(tipoReporte === "cambios"){
+    return rows.filter(r => r.data && (r.data.statusChange || Object.prototype.hasOwnProperty.call(r.data, "status")));
+  }
+  return rows;
+}
+
 function renderInformesUI(){
   const cont = document.getElementById("informesView");
   if(!cont) return;
@@ -1178,20 +1189,34 @@ function renderInformesUI(){
     <div class="titulo-piso">📁 INFORMES (Historial)</div>
 
     <div class="box" style="width:min(1100px, 96%);">
-      <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:end;">
-        <div style="min-width:220px;">
-          <label style="font-size:12px;color:#555;">Fecha</label>
-          <input type="date" id="infDate" value="${todayISO}" />
+      <div class="filtros-informes">
+        <div>
+          <label style="font-size:12px;color:#555;">Fecha inicial</label>
+          <input type="date" id="infDateStart" value="${todayISO}" />
         </div>
+        <div>
+          <label style="font-size:12px;color:#555;">Fecha final</label>
+          <input type="date" id="infDateEnd" value="${todayISO}" />
+        </div>
+        <div>
+          <label style="font-size:12px;color:#555;">Tipo de reporte</label>
+          <select id="infTipoReporte">
+            <option value="general">Historial general</option>
+            <option value="cambios">Cambios de estado</option>
+            <option value="aseos">Reporte de aseos (VS → VL)</option>
+          </select>
+        </div>
+      </div>
 
+      <div class="actions">
         <button class="btn primary" id="infBuscar">Buscar</button>
+        <button class="btn" id="infSoloAseos">🧹 Reporte de aseos</button>
         <button class="btn" id="infPdf">Descargar PDF</button>
-
         <span class="badge" id="infBadge"></span>
       </div>
 
       <div class="hint" style="margin-top:8px;">
-        Vista de solo lectura. Aquí no se puede editar nada.
+        El reporte de aseos muestra únicamente habitaciones que pasaron de VS (Vacío sucio) a VL (Vacío limpio).
       </div>
     </div>
 
@@ -1207,13 +1232,23 @@ function renderInformesUI(){
           </tr>
         </thead>
         <tbody>
-          <tr><td colspan="5">Selecciona una fecha y presiona Buscar…</td></tr>
+          <tr><td colspan="5">Selecciona filtros y presiona Buscar…</td></tr>
         </tbody>
       </table>
     </div>
   `;
 
-  document.getElementById("infBuscar").onclick = async () => { await cargarInformesTabla(); };
+  document.getElementById("infBuscar").onclick = async () => {
+    informesVistaActual = document.getElementById("infTipoReporte").value;
+    await cargarInformesTabla();
+  };
+
+  document.getElementById("infSoloAseos").onclick = async () => {
+    document.getElementById("infTipoReporte").value = "aseos";
+    informesVistaActual = "aseos";
+    await cargarInformesTabla();
+  };
+
   document.getElementById("infPdf").onclick = async () => { await descargarParteDiarioPDFDesdeInformes(); };
 
   cargarInformesTabla();
@@ -1222,27 +1257,31 @@ function renderInformesUI(){
 async function cargarInformesTabla(){
   const badge = document.getElementById("infBadge");
   const tbody = document.querySelector("#infTable tbody");
-  const dateISO = document.getElementById("infDate")?.value;
+  const startISO = document.getElementById("infDateStart")?.value;
+  const endISO = document.getElementById("infDateEnd")?.value;
+  const tipoReporte = document.getElementById("infTipoReporte")?.value || informesVistaActual || "general";
 
-  if(!tbody || !dateISO) return;
+  if(!tbody || !startISO || !endISO) return;
 
   badge.textContent = "Cargando…";
 
-  const start = new Date(dateISO + "T00:00:00");
-  const end = new Date(dateISO + "T00:00:00");
+  const start = new Date(startISO + "T00:00:00");
+  const end = new Date(endISO + "T00:00:00");
   end.setDate(end.getDate() + 1);
 
   try{
     const rows = await window.fetchAuditRange(start, end);
-    informesCache = rows;
+    const filtrados = filtrarRowsPorVista(rows, tipoReporte);
+    informesCache = filtrados;
+    informesVistaActual = tipoReporte;
 
-    if(rows.length === 0){
-      tbody.innerHTML = `<tr><td colspan="5">No hay movimientos en ese día.</td></tr>`;
+    if(filtrados.length === 0){
+      tbody.innerHTML = `<tr><td colspan="5">No hay registros para ese filtro.</td></tr>`;
       badge.textContent = "0 registros";
       return;
     }
 
-    tbody.innerHTML = rows.map(e=>{
+    tbody.innerHTML = filtrados.map(e=>{
       const room = e.roomId || "—";
       const by = e.by || "—";
       const dt = formatDT(e.at);
@@ -1256,7 +1295,7 @@ async function cargarInformesTabla(){
       </tr>`;
     }).join("");
 
-    badge.textContent = `${rows.length} registros`;
+    badge.textContent = `${filtrados.length} registros`;
   } catch(err){
     console.error(err);
     tbody.innerHTML = `<tr><td colspan="5">Error cargando informes. Revisa consola (F12).</td></tr>`;
@@ -1271,20 +1310,22 @@ async function descargarParteDiarioPDFDesdeInformes(){
       return;
     }
 
-    if(!informesCache){
-      await cargarInformesTabla();
-    }
-
-    const dateISO = document.getElementById("infDate")?.value || new Date().toISOString().slice(0,10);
     const operator = localStorage.getItem("staffName") || "—";
+    const startISO = document.getElementById("infDateStart")?.value || new Date().toISOString().slice(0,10);
+    const endISO = document.getElementById("infDateEnd")?.value || startISO;
+    const tipoReporte = document.getElementById("infTipoReporte")?.value || informesVistaActual || "general";
+
     const audit = informesCache || [];
 
-    let total = audit.length, estado=0, nota=0, camas=0, tipos=0, intervenciones=0;
+    let total = audit.length, estado=0, nota=0, camas=0, tipos=0, intervenciones=0, aseos=0;
     const porOperador = {};
+
     audit.forEach(e=>{
       const by = e.by || "—";
       porOperador[by] = (porOperador[by]||0) + 1;
-      if(e.data && "status" in e.data) estado++;
+
+      if(isCleaningTransition(e.data)) aseos++;
+      else if(e.data && (e.data.statusChange || "status" in e.data)) estado++;
       else if(e.data && "note" in e.data) nota++;
       else if(e.data && "beds" in e.data) camas++;
       else if(e.data && "roomType" in e.data) tipos++;
@@ -1306,31 +1347,33 @@ async function descargarParteDiarioPDFDesdeInformes(){
 
     doc.setFont("helvetica", "bold");
     doc.setFontSize(14);
-    doc.text("Parte Diario — Control de Habitaciones", 40, 40);
+    doc.text("Reporte — Control de Habitaciones", 40, 40);
 
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.text("Hotel: Lord Pierre", 40, 60);
-    doc.text(`Fecha: ${dateISO}`, 40, 74);
-    doc.text(`Generado por: ${operator}`, 40, 88);
-    doc.text(`Hora: ${new Date().toLocaleString()}`, 40, 102);
+    doc.text(`Rango: ${startISO} a ${endISO}`, 40, 74);
+    doc.text(`Tipo de reporte: ${tipoReporte === "aseos" ? "Aseos (VS → VL)" : tipoReporte === "cambios" ? "Cambios de estado" : "Historial general"}`, 40, 88);
+    doc.text(`Generado por: ${operator}`, 40, 102);
+    doc.text(`Hora: ${new Date().toLocaleString()}`, 40, 116);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Resumen del día", 40, 128);
+    doc.text("Resumen", 40, 142);
 
     doc.setFont("helvetica", "normal");
-    doc.text(`Total acciones: ${total}`, 40, 146);
-    doc.text(`Cambios de estado general: ${estado}`, 40, 160);
-    doc.text(`Notas: ${nota}`, 40, 174);
-    doc.text(`Camas: ${camas}`, 40, 188);
-    doc.text(`Tipos de habitación: ${tipos}`, 40, 202);
-    doc.text(`Intervenciones: ${intervenciones}`, 40, 216);
+    doc.text(`Total registros: ${total}`, 40, 160);
+    doc.text(`Aseos detectados: ${aseos}`, 40, 174);
+    doc.text(`Cambios de estado: ${estado}`, 40, 188);
+    doc.text(`Notas: ${nota}`, 40, 202);
+    doc.text(`Camas: ${camas}`, 40, 216);
+    doc.text(`Tipos de habitación: ${tipos}`, 40, 230);
+    doc.text(`Intervenciones: ${intervenciones}`, 40, 244);
 
     doc.setFont("helvetica", "bold");
-    doc.text("Actividad por operador (Top)", 40, 240);
+    doc.text("Actividad por operador (Top)", 40, 270);
     doc.setFont("helvetica", "normal");
 
-    let y = 256;
+    let y = 286;
     if(topOps.length === 0){
       doc.text("—", 40, y); y += 14;
     } else {
@@ -1343,18 +1386,18 @@ async function descargarParteDiarioPDFDesdeInformes(){
     doc.autoTable({
       startY: y + 10,
       head: [["Fecha/Hora","Habitación","Acción","Detalle","Operador"]],
-      body: tableRows.length ? tableRows : [["—","—","—","No hay movimientos en el día.","—"]],
+      body: tableRows.length ? tableRows : [["—","—","—","No hay movimientos en el rango.","—"]],
       styles: { fontSize: 9, cellPadding: 4, overflow: "linebreak" }
     });
 
-    doc.save(`ParteDiario_LordPierre_${dateISO}.pdf`);
+    const nombre = tipoReporte === "aseos" ? "ReporteAseos" : "ReporteHabitaciones";
+    doc.save(`${nombre}_LordPierre_${startISO}_a_${endISO}.pdf`);
   } catch(err){
     console.error(err);
     alert("No se pudo generar el PDF. Revisa la consola (F12) para ver el error.");
   }
 }
 
-/* ================== Navegación ================== */
 document.querySelectorAll(".btn-piso").forEach(btn=>{
   btn.addEventListener("click",()=>{
     if(btn.classList.contains("active")) return;
@@ -1365,7 +1408,6 @@ document.querySelectorAll(".btn-piso").forEach(btn=>{
     const key = btn.dataset.piso;
     menu.style.display="none";
 
-    // Oculta vistas
     document.querySelectorAll(".piso").forEach(p=>p.classList.remove("active"));
     document.getElementById("resumenView").classList.remove("active");
 
@@ -1400,13 +1442,11 @@ document.querySelectorAll(".btn-piso").forEach(btn=>{
   });
 });
 
-/* ====== Bootstrap ====== */
 [2,3,4].forEach(crearPiso);
 pintarOperadorEnResumen();
 lockUI(!hasOperator());
 </script>
 
-<!-- === Firebase + Realtime === -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
   import {
@@ -1463,7 +1503,6 @@ lockUI(!hasOperator());
 </script>
 
 <script>
-/* ================== Realtime Rooms → Cache + DOM ================== */
 window.renderRooms = (rooms) => {
   rooms.forEach(r => {
     const idStr = String(r.id);
