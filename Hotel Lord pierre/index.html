@@ -364,6 +364,36 @@ function isCleaningTransition(data){
   return false;
 }
 
+function canSetRoomColor(piso, num, nextColor){
+  const room = getRoomData(piso, String(num)) || {};
+  const currentColor = room.color || "verde";
+  const interventionStatus = room.intervencion?.estadoIntervencion || "pendiente";
+
+  const wantsDirtyToClean = currentColor === "naranja" && nextColor === "verde";
+
+  if(wantsDirtyToClean && interventionStatus !== "terminada"){
+    alert("No puedes cambiar la habitación a 'Vacío limpio' mientras la intervención de aseo esté en 'Pendiente'. Primero marca la intervención como 'Terminada'.");
+    return false;
+  }
+
+  return true;
+}
+
+function canSetInterventionStatus(piso, num, nextStatus){
+  const room = getRoomData(piso, String(num)) || {};
+  const currentColor = room.color || "verde";
+
+  const roomIsClean = currentColor === "verde";
+  const wantsPending = nextStatus === "pendiente";
+
+  if(roomIsClean && wantsPending){
+    alert("No puedes marcar la intervención como 'Pendiente' mientras la habitación esté en 'Vacío limpio'. Primero cambia el estado de la habitación si realmente requiere intervención.");
+    return false;
+  }
+
+  return true;
+}
+
 function crearPiso(piso){
   const cont=document.getElementById(`piso${piso}`);
   cont.innerHTML=`
@@ -760,6 +790,7 @@ function actualizarPanelIntervencion(){
   const num = String(habitacionSeleccionada.dataset.num);
   const saved = getRoomData(p, num);
   const interv = { ...getDefaultIntervencion(), ...(saved.intervencion || {}) };
+  const estadoOriginal = interv.estadoIntervencion || "pendiente";
 
   inputAsignada.disabled = false;
   inputFecha.disabled = false;
@@ -772,13 +803,14 @@ function actualizarPanelIntervencion(){
   titulo.textContent = `🧹 Control de intervención ${num}`;
   inputAsignada.value = interv.asignadaA || "";
   inputFecha.value = interv.fechaIntervencion || "";
-  selectEstado.value = interv.estadoIntervencion || "pendiente";
+  selectEstado.value = estadoOriginal;
   txtAct.textContent = interv.actualizacionIntervencion || "Sin registrar";
   txtPor.textContent = interv.actualizadaPor || "—";
   label.textContent = INTERVENCION_MAP[selectEstado.value]?.label || "Pendiente";
   dot.className = `dot ${selectEstado.value === "terminada" ? "terminada" : "pendiente"}`;
 
   btnPendiente.onclick = ()=> {
+    if(!canSetInterventionStatus(p, num, "pendiente")) return;
     selectEstado.value = "pendiente";
     label.textContent = "Pendiente";
     dot.className = "dot pendiente";
@@ -791,6 +823,9 @@ function actualizarPanelIntervencion(){
   };
 
   selectEstado.onchange = ()=> {
+    if(!canSetInterventionStatus(p, num, selectEstado.value)){
+      selectEstado.value = estadoOriginal;
+    }
     label.textContent = INTERVENCION_MAP[selectEstado.value]?.label || "Pendiente";
     dot.className = `dot ${selectEstado.value === "terminada" ? "terminada" : "pendiente"}`;
   };
@@ -801,6 +836,14 @@ function actualizarPanelIntervencion(){
     const asignadaA = inputAsignada.value.trim();
     const fechaIntervencion = inputFecha.value || hoyISO();
     const estadoIntervencion = selectEstado.value || "pendiente";
+
+    if(!canSetInterventionStatus(p, num, estadoIntervencion)){
+      selectEstado.value = estadoOriginal;
+      label.textContent = INTERVENCION_MAP[selectEstado.value]?.label || "Pendiente";
+      dot.className = `dot ${selectEstado.value === "terminada" ? "terminada" : "pendiente"}`;
+      return;
+    }
+
     const actualizacionIntervencion = ahoraStr();
     const actualizadaPor = localStorage.getItem("staffName") || "";
 
@@ -847,6 +890,8 @@ function actualizarPanelIntervencion(){
 
   btnLimpiar.onclick = async ()=>{
     if(!hasOperator()){ alert("Identifícate primero."); return; }
+
+    if(!canSetInterventionStatus(p, num, "pendiente")) return;
 
     const intervencionPayload = getDefaultIntervencion();
     upsertRoomData(p, num, {
@@ -1086,6 +1131,11 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
     const prevData = getRoomData(p, num) || {};
     const previousStatus = prevData.color || obtenerColor(habitacionSeleccionada);
 
+    if(!canSetRoomColor(p, num, color)){
+      menu.style.display="none";
+      return;
+    }
+
     habitacionSeleccionada.className=`habitacion ${color}`;
     setEtiqueta(habitacionSeleccionada,color);
 
@@ -1100,6 +1150,7 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
     }, {persist:true});
 
     actualizarPanelEstado();
+    actualizarPanelIntervencion();
     solicitarResumen();
     menu.style.display="none";
 
@@ -1118,7 +1169,10 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
         }
       });
     }
-    catch(e){ alert("No se pudo sincronizar en la nube. Revisa tu conexión."); console.warn(e); }
+    catch(e){
+      alert("No se pudo sincronizar en la nube. Revisa tu conexión.");
+      console.warn(e);
+    }
   });
 });
 
