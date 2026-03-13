@@ -364,46 +364,14 @@ function isCleaningTransition(data){
   return false;
 }
 
-function forcePendingIntervention(piso, num){
-  const room = getRoomData(piso, String(num)) || {};
-  const operator = localStorage.getItem("staffName") || "";
-  const actualizacionIntervencion = ahoraStr();
-
-  const intervencionPayload = {
-    ...getDefaultIntervencion(),
-    ...(room.intervencion || {}),
-    estadoIntervencion:"pendiente",
-    fechaIntervencion:(room.intervencion?.fechaIntervencion || hoyISO()),
-    actualizacionIntervencion,
-    actualizadaPor:operator
-  };
-
-  upsertRoomData(piso, num, {
-    intervencion: intervencionPayload,
-    fecha: actualizacionIntervencion,
-    por: operator
-  }, {persist:true});
-
-  return {
-    assignedTo: intervencionPayload.asignadaA || "",
-    interventionDate: intervencionPayload.fechaIntervencion || "",
-    interventionStatus: "pendiente",
-    lastUpdate: actualizacionIntervencion,
-    updatedByOperator: operator
-  };
-}
-
 function canSetRoomColor(piso, num, nextColor){
   const room = getRoomData(piso, String(num)) || {};
   const currentColor = room.color || "verde";
   const interventionStatus = room.intervencion?.estadoIntervencion || "pendiente";
 
-  if(currentColor === "amarillo" && nextColor === "verde"){
-    alert("No puedes pasar una habitación de 'Ocupado' a 'Vacío limpio' directamente. Primero debe pasar a 'Vacío sucio' y quedar pendiente de aseo.");
-    return false;
-  }
+  const wantsDirtyToClean = currentColor === "naranja" && nextColor === "verde";
 
-  if(currentColor === "naranja" && nextColor === "verde" && interventionStatus !== "terminada"){
+  if(wantsDirtyToClean && interventionStatus !== "terminada"){
     alert("No puedes cambiar la habitación a 'Vacío limpio' mientras la intervención de aseo esté en 'Pendiente'. Primero marca la intervención como 'Terminada'.");
     return false;
   }
@@ -1171,20 +1139,12 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
     habitacionSeleccionada.className=`habitacion ${color}`;
     setEtiqueta(habitacionSeleccionada,color);
 
-    let intervencionPayload = prevData.intervencion || getDefaultIntervencion();
-    let interventionSyncPayload = null;
-
-    if(previousStatus === "amarillo" && color === "naranja"){
-      interventionSyncPayload = forcePendingIntervention(p, num);
-      intervencionPayload = getRoomData(p, num).intervencion;
-    }
-
     upsertRoomData(p, num, {
       color,
       nota:  prevData.nota || "",
       camas: prevData.camas || [],
       tipoHabitacion: prevData.tipoHabitacion || "",
-      intervencion: intervencionPayload,
+      intervencion: prevData.intervencion || getDefaultIntervencion(),
       fecha: ahoraStr(),
       por:   localStorage.getItem("staffName")
     }, {persist:true});
@@ -1200,20 +1160,14 @@ menu.querySelectorAll(".color-opcion").forEach(opt=>{
     }
 
     try {
-      const payload = {
+      await window.syncRoom(num, {
         status: color,
         previousStatus,
         statusChange: {
           from: previousStatus,
           to: color
         }
-      };
-
-      if(interventionSyncPayload){
-        payload.intervention = interventionSyncPayload;
-      }
-
-      await window.syncRoom(num, payload);
+      });
     }
     catch(e){
       alert("No se pudo sincronizar en la nube. Revisa tu conexión.");
@@ -1653,3 +1607,4 @@ window.renderRooms = (rooms) => {
 
 </body>
 </html>
+
